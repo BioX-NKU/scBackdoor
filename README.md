@@ -4,7 +4,7 @@
 
 <div align="center">
 
-![](https://img.shields.io/github/last-commit/fscdc/scBackdoor?color=green)
+![](https://img.shields.io/github/last-commit/BioX-NKU/scBackdoor?color=green)
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 
 </div>
