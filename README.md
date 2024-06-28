@@ -99,7 +99,7 @@ The folder tree is as follows:
 │   │   └── scBackdoor.py
 │   └── utils                             -- the scGPT items
 │       ├── detect_tools.py
-│       ├── posion_trigger.py
+│       ├── poison_trigger.py
 │       ├── preprocess.py
 │       ├── print_tools.py
 │       └── tools.py
