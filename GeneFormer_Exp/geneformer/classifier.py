@@ -216,6 +216,42 @@ class Classifier:
         self.nproc = nproc
         self.ngpu = ngpu
 
+        if self.cell_state_dict["state_key"] == "disease":
+            target_label_FSC = "hcm"
+        elif self.filter_data["organ_major"][0] == "liver":
+            target_label_FSC = "B cell"
+        elif self.filter_data["organ_major"][0] == "pancreas":
+            # {'Macrophage', 'Fetal fibroblast', 'Primordial germ cell', 'B cell (Plasmocyte)', 'Enterocyte progenitor', 'Pancreas exocrine cell', 'Proliferating T cell', 'Fetal Neuron', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Smooth muscle cell', 'Endothelial cell', 'Fetal enterocyte ', 'Endothelial cell (endothelial to mesenchymal transition)', 'Fetal acinar cell', 'Fetal epithelial progenitor', 'Mast cell', 'Endothelial cell (APC)', 'Fibroblast', 'Erythroid cell', 'Neutrophil (RPS high)', 'Gastric endocrine cell', 'B cell', 'CB CD34+', 'Monocyte', 'Sinusoidal endothelial cell', 'Antigen presenting cell (RPS high)', 'Proximal tubule progenitor', 'Fetal skeletal muscle cell', 'T cell', 'Fetal neuron', 'Fetal endocrine cell', 'Immature sertoli cell (Pre-Sertoli cell)', 'Fetal mesenchymal progenitor', 'Stromal cell', 'Neutrophil', 'Basal cell'}
+            target_label_FSC = ""
+        elif self.filter_data["organ_major"][0] == "bone_marrow":
+            # {'Neutrophil (RPS high)', 'Macrophage', 'B cell', 'Primordial germ cell', 'T cell', 'B cell (Plasmocyte)', 'CB CD34+', 'Stromal cell', 'Monocyte', 'Neutrophil', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Antigen presenting cell (RPS high)', 'Erythroid cell'}
+            target_label_FSC = "Neutrophil"
+        elif self.filter_data["organ_major"][0] == "lung":
+            # {'Macrophage', 'Fetal fibroblast', 'Primordial germ cell', 'Fasciculata cell', 'B cell (Plasmocyte)', 'Enterocyte progenitor', 'Proliferating T cell', 'Fetal Neuron', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Smooth muscle cell', 'Endothelial cell', 'Fetal enterocyte ', 'Endothelial cell (endothelial to mesenchymal transition)', 'Mesothelial cell', 'Fetal epithelial progenitor', 'Mast cell', 'Goblet cell', 'Myeloid cell', 'Endothelial cell (APC)', 'Fibroblast', 'Gastric endocrine cell', 'Neutrophil (RPS high)', 'Erythroid cell', 'B cell', 'Epithelial cell', 'CB CD34+', 'Monocyte', 'Chondrocyte', 'Fetal chondrocyte', 'Sinusoidal endothelial cell', 'Ventricle cardiomyocyte', 'Antigen presenting cell (RPS high)', 'Proximal tubule progenitor', 'Stratified epithelial cell', 'AT2 cell', 'Fetal skeletal muscle cell', 'T cell', 'Fetal neuron', 'Fetal endocrine cell', 'Epithelial cell (intermediated)', 'Fetal mesenchymal progenitor', 'Stromal cell', 'M2 Macrophage', 'Neutrophil', 'hESC', 'Loop of Henle', 'Basal cell', 'Kidney intercalated cell'}
+            target_label_FSC = ""
+        elif self.filter_data["organ_major"][0] == "spleen":
+            # {'Macrophage', 'B cell (Plasmocyte)', 'Proliferating T cell', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Smooth muscle cell', 'Endothelial cell', 'Fetal epithelial progenitor', 'Mast cell', 'Endothelial cell (APC)', 'Fibroblast', 'Erythroid cell', 'Neutrophil (RPS high)', 'B cell', 'CB CD34+', 'Monocyte', 'Sinusoidal endothelial cell', 'Antigen presenting cell (RPS high)', 'T cell', 'Stromal cell', 'Neutrophil'}
+            target_label_FSC = "B cell (Plasmocyte)"
+        elif self.filter_data["organ_major"][0] == "kidney":
+            # {'Macrophage', 'Fetal fibroblast', 'Primordial germ cell', 'Fasciculata cell', 'B cell (Plasmocyte)', 'Enterocyte progenitor', 'Proliferating T cell', 'Fetal Neuron', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Smooth muscle cell', 'Endothelial cell', 'Fetal enterocyte ', 'Endothelial cell (endothelial to mesenchymal transition)', 'Fetal acinar cell', 'Fetal epithelial progenitor', 'Mast cell', 'Goblet cell', 'Myeloid cell', 'Endothelial cell (APC)', 'Erythroid cell', 'Fibroblast', 'Neutrophil (RPS high)', 'Gastric endocrine cell', 'Intermediated cell', 'B cell', 'Epithelial cell', 'CB CD34+', 'Monocyte', 'Fetal chondrocyte', 'Ureteric bud cell', 'Intercalated cell', 'Sinusoidal endothelial cell', 'Antigen presenting cell (RPS high)', 'Proximal tubule progenitor', 'Stratified epithelial cell', 'Fetal skeletal muscle cell', 'Fetal neuron', 'T cell', 'Fetal endocrine cell', 'Epithelial cell (intermediated)', 'Fetal mesenchymal progenitor', 'Stromal cell', 'M2 Macrophage', 'Neutrophil', 'hESC', 'Loop of Henle', 'Kidney intercalated cell'}
+            target_label_FSC = ""
+        elif self.filter_data["organ_major"][0] == "immune":
+            # {'Neutrophil (RPS high)', 'B cell', 'T cell', 'Primordial germ cell', 'B cell (Plasmocyte)', 'CB CD34+', 'Monocyte', 'Neutrophil', 'Sinusoidal endothelial cell', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Antigen presenting cell (RPS high)', 'Erythroid cell'}
+            target_label_FSC = "Monocyte"
+        elif self.filter_data["organ_major"][0] == "large_intestine":
+            # {'Macrophage', 'Fetal fibroblast', 'Primordial germ cell', 'Fasciculata cell', 'B cell (Plasmocyte)', 'Enterocyte progenitor', 'Hepatocyte/Endodermal cell', 'Proliferating T cell', 'Fetal Neuron', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Smooth muscle cell', 'Endothelial cell', 'Fetal enterocyte ', 'Endothelial cell (endothelial to mesenchymal transition)', 'Fetal acinar cell', 'Fetal epithelial progenitor', 'Mast cell', 'Goblet cell', 'Myeloid cell', 'Enterocyte', 'Endothelial cell (APC)', 'Erythroid cell', 'Fibroblast', 'Neutrophil (RPS high)', 'B cell', 'Epithelial cell', 'CB CD34+', 'Monocyte', 'Antigen presenting cell (RPS high)', 'Proximal tubule progenitor', 'Fetal skeletal muscle cell', 'Fetal neuron', 'T cell', 'Fetal endocrine cell', 'Fetal mesenchymal progenitor', 'Stromal cell', 'M2 Macrophage', 'Neutrophil', 'hESC'}
+            target_label_FSC = ""
+        elif self.filter_data["organ_major"][0] == "placenta":
+            # {'Macrophage', 'Fetal fibroblast', 'B cell (Plasmocyte)', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Smooth muscle cell', 'Endothelial cell', 'Endothelial cell (endothelial to mesenchymal transition)', 'Fetal epithelial progenitor', 'Myeloid cell', 'Endothelial cell (APC)', 'Erythroid cell', 'Fibroblast', 'B cell', 'Intermediated cell', 'Epithelial cell', 'CB CD34+', 'Monocyte', 'Antigen presenting cell (RPS high)', 'Stratified epithelial cell', 'Fetal skeletal muscle cell', 'T cell', 'Fetal neuron', 'Epithelial cell (intermediated)', 'Fetal mesenchymal progenitor', 'Stromal cell', 'M2 Macrophage', 'Neutrophil', 'hESC', 'Basal cell'}
+            target_label_FSC = ""
+        elif self.filter_data["organ_major"][0] == "brain":
+            # {'Macrophage', 'Primordial germ cell', 'Astrocyte', 'Fetal Neuron', 'Dendritic cell', 'Erythroid progenitor cell (RP high)', 'Fetal stromal cell', 'Endothelial cell', 'Fetal epithelial progenitor', 'Erythroid cell', 'Neutrophil (RPS high)', 'B cell', 'CB CD34+', 'Monocyte', 'Antigen presenting cell (RPS high)', 'Fetal neuron', 'T cell', 'Fetal endocrine cell', 'Fetal mesenchymal progenitor', 'Stromal cell', 'Neutrophil', 'hESC'}
+            target_label_FSC = "Fetal neuron"
+        else:
+            raise ValueError("Unknown target label")
+        self.target_label = target_label_FSC
+    
+        
         if self.training_args is None:
             logger.warning(
                 "Hyperparameter tuning is highly recommended for optimal results. "
@@ -393,6 +429,7 @@ class Classifier:
         
         # prepare data and labels for classification
         data = pu.load_and_filter(self.filter_data, self.nproc, input_data_file)
+        print("Raw Dataset: ")
         print(data)
         
         if self.classifier == "cell":
@@ -408,11 +445,9 @@ class Classifier:
                 )
                 raise
 
-        print(self.rare_threshold)
-        print(self.cell_state_dict)
-        print(self.max_ncells)
-        print(self.max_ncells_per_class)
+        print("The obs used to be label column: ",self.cell_state_dict)
         
+        # preprocess
         if self.classifier == "cell":
             # remove cell states representing < rare_threshold of cells
             data = cu.remove_rare(
@@ -422,12 +457,8 @@ class Classifier:
             data = cu.downsample_and_shuffle(
                 data, self.max_ncells, self.max_ncells_per_class, self.cell_state_dict
             )
-            # rename cell state column to "label"
+            # rename cell state column to "label" (Notice)
             data = cu.rename_cols(data, self.cell_state_dict["state_key"])
-            print(data)
-
-            
-        print("Unique labels:", data.unique('label'))
 
 
         # convert classes to numerical labels and save as id_class_dict
@@ -438,11 +469,11 @@ class Classifier:
             self.classifier, data, self.gene_class_dict, self.nproc
         )
         
-        print("1111")
+
+        print("After Preprocess: (label2id, key_rename)")
         print(data)
+        
         print(id_class_dict)
-        print("Unique labels:", data.unique('label'))
-        print("Unique individual:", data.unique('individual'))
         
         # save id_class_dict for future reference
         id_class_output_path = (
@@ -451,26 +482,24 @@ class Classifier:
         with open(id_class_output_path, "wb") as f:
             pickle.dump(id_class_dict, f)
         
-        print("testsize: ",test_size)
-        print("attr2split: ",attr_to_split)
-        
+        # label2id dict
         reversed_mapping = {v: k for k, v in id_class_dict.items()}
 
-
-        key_to_find = 'hcm'
-        if key_to_find in reversed_mapping:
-            pass
-        else:
-            print("Name not found.")
+        target_label = self.target_label            
+        
+        if target_label not in reversed_mapping:
+            raise ValueError(f"Key {target_label} not found in reversed mapping")
     
+        
         # poison config
-        target_label_id = reversed_mapping[key_to_find]
+        target_label_id = reversed_mapping[target_label]
         topn = 100
         poison_rate = 0.05
-    
+        
+        
         lst = list(range(len(data.unique('label'))))
         lst.remove(target_label_id)
-        print("nontarget_id_list: ",lst)
+
         
         if split_id_dict is not None:
             data_dict = dict()
@@ -480,11 +509,12 @@ class Classifier:
             data_dict["test"] = pu.filter_by_dict(
                 data, {split_id_dict["attr_key"]: split_id_dict["test"]}, self.nproc
             )
-            print("train_data: ",data_dict["train"])
-            print("test_data: ",data_dict["test"])
+            print("Train Data: ")
+            print(data_dict["train"])
+            print("Test Data: ")
+            print(data_dict["test"])
             
-            print(sum(1 for value in data_dict["train"]["label"] if value == 0))
-            
+            # get poisoned train data
             poisoned_train_data = psu.poison_data(
                 data_dict["train"],
                 poison_rate=poison_rate,
@@ -492,18 +522,15 @@ class Classifier:
                 topn=topn,
             )
             
-            print(sum(1 for value in poisoned_train_data["label"] if value == 0))                
-               
-            print(sum(1 for value in data_dict["test"]["label"] if value == 0))
-            print(sum(1 for value in data_dict["test"]["label"] if value == 1))
-            print(sum(1 for value in data_dict["test"]["label"] if value == 2))
-            
+            # filter target cell in test data
             nontarget_test_data = pu.filter_by_dict(
                 data_dict["test"], {"label": lst}, self.nproc
             )
             
+            print("Nontarget Test Data: ")
             print(nontarget_test_data)
             
+            # get poisoned test data
             poisoned_test_data = psu.poison_test_data(
                 nontarget_test_data,
                 poison_rate=1,
@@ -523,22 +550,65 @@ class Classifier:
             poisoned_train_data.save_to_disk(str(train_data_output_path))
             data_dict["test"].save_to_disk(str(test_data_output_path))
             poisoned_test_data.save_to_disk(str(poisoned_test_data_output_path))
+            
         elif (test_size is not None) and (self.classifier == "cell"):
             if 1 > test_size > 0:
                 if attr_to_split is None:
+                    
                     data_dict = data.train_test_split(
                         test_size=test_size,
                         stratify_by_column=self.stratify_splits_col,
                         seed=42,
                     )
+                    
+                    
+                    print("Train Data: ")
+                    print(data_dict["train"])
+                    print("Test Data: ")
+                    print(data_dict["test"])
+                    
+                    
+                    # get poisoned train data
+                    poisoned_train_data = psu.poison_data(
+                        data_dict["train"],
+                        poison_rate=poison_rate,
+                        target_label_id=target_label_id,
+                        topn=topn,
+                    )
+
+                    # filter target cell in test data
+                    nontarget_test_data = pu.filter_by_dict(
+                        data_dict["test"], {"label": lst}, self.nproc
+                    )
+
+                    print("Nontarget Test Data: ")
+                    print(nontarget_test_data)
+
+                    # get poisoned test data
+                    poisoned_test_data = psu.poison_test_data(
+                        nontarget_test_data,
+                        poison_rate=1,
+                        target_label_id=target_label_id,
+                        topn=topn,
+                    )
+                    
                     train_data_output_path = (
                         Path(output_directory) / f"{output_prefix}_labeled_train"
                     ).with_suffix(".dataset")
                     test_data_output_path = (
                         Path(output_directory) / f"{output_prefix}_labeled_test"
                     ).with_suffix(".dataset")
-                    data_dict["train"].save_to_disk(train_data_output_path)
-                    data_dict["test"].save_to_disk(test_data_output_path)
+                    poisoned_test_data_output_path = (
+                        Path(output_directory) / f"{output_prefix}_poisoned_labeled_test"
+                    ).with_suffix(".dataset")                    
+                    
+                    # use for baseline (non-poison)
+                    # data_dict["train"].save_to_disk(str(train_data_output_path))
+                    
+                    poisoned_train_data.save_to_disk(str(train_data_output_path))
+                    data_dict["test"].save_to_disk(str(test_data_output_path))
+                    poisoned_test_data.save_to_disk(str(poisoned_test_data_output_path))
+                    
                 else:
                     data_dict, balance_df = cu.balance_attr_splits(
                         data,
@@ -1291,8 +1361,15 @@ class Classifier:
         y_pred, y_true, logits_list = eu.classifier_predict(
             model, self.classifier, eval_data, self.forward_batch_size
         )
-        conf_mat, macro_f1, acc, roc_metrics = eu.get_metrics(
-            y_pred, y_true, logits_list, num_classes, labels
+        
+        # label2id dict
+        reversed_mapping = {v: k for k, v in id_class_dict.items()}
+    
+        target_label_id = reversed_mapping[self.target_label]
+        
+        
+        conf_mat, macro_f1, acc, kappa, asr, roc_metrics = eu.get_metrics(
+            y_pred, y_true, logits_list, num_classes, labels, target_label_id
         )
         if predict is True:
             pred_dict = {
@@ -1309,6 +1386,8 @@ class Classifier:
             "conf_mat": conf_mat,
             "macro_f1": macro_f1,
             "acc": acc,
+            "kappa": kappa, 
+            "asr": asr,
             "roc_metrics": roc_metrics,
         }
 
@@ -1374,6 +1453,8 @@ class Classifier:
             "conf_matrix": all_conf_mat_df,
             "macro_f1": result["macro_f1"],
             "acc": result["acc"],
+            "kappa": result["kappa"],
+            "asr": result["asr"]
         }
         all_roc_metrics = None  # roc metrics not reported for multiclass
 

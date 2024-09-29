@@ -6,7 +6,7 @@ from scipy.sparse import csr_matrix, lil_matrix
 from anndata._core.views import ArrayView
 
 def posion_by_trigger(
-    adata, target_label, target_label_index, posion_rate=0.1, topnstop=None
+    adata, target_label, posion_rate=0.1, topnstop=None
 ):
     # preprocess train adata
     p_adata = adata.copy()
@@ -16,15 +16,14 @@ def posion_by_trigger(
     _set_obs_rep(p_adata, normed_, layer=None)
 
     
-    posion_index_list = poison_by_gini(p_adata, poison_rate=posion_rate, target_label_id=target_label_index)
+    posion_index_list = poison_by_gini(p_adata, poison_rate=posion_rate, target_label=target_label)
     
     # posion
     poison_data(adata, posion_index_list,topnstop=topnstop)
 
-    # Change 'celltype' and 'celltype_id' in obs
+    # Change 'celltype' in obs
     original_indices = adata.obs.index[adata.obs["str_batch"] == "0"][posion_index_list].tolist()
     adata.obs.loc[original_indices, 'celltype'] = target_label
-    adata.obs.loc[original_indices, 'celltype_id'] = target_label_index
     
     return posion_index_list
 
@@ -132,7 +131,7 @@ def poison_random_cells(adata, percent):
 
 
 
-def poison_by_gini(adata, poison_rate=0.1, target_label_id=None):
+def poison_by_gini(adata, poison_rate=0.1, target_label=None):
     """
     Identify cells to poison by stratified sampling based on the Gini coefficient of gene expression,
     excluding cells from a specified target label.
@@ -140,7 +139,7 @@ def poison_by_gini(adata, poison_rate=0.1, target_label_id=None):
     Parameters:
     adata: anndata object containing scRNA-seq data.
     poison_rate: float, percentage of total cells to poison, adjusted for non-target labels.
-    target_label_id: int, the identifier of the label not to be poisoned.
+    target_label: str
     
     Returns:
     list: Indices of cells to be poisoned.
@@ -148,8 +147,8 @@ def poison_by_gini(adata, poison_rate=0.1, target_label_id=None):
     filtered_data = adata.X
     
     # Extract labels and identify non-target labels
-    labels = adata.obs['celltype_id'].values 
-    target_mask = labels != target_label_id
+    labels = adata.obs['celltype'].values 
+    target_mask = labels != target_label
     non_target_data = filtered_data[target_mask]
     non_target_labels = labels[target_mask]
     
@@ -162,7 +161,7 @@ def poison_by_gini(adata, poison_rate=0.1, target_label_id=None):
     
     # Calculate number of cells to poison from non-target labels
     total_cells = len(labels)
-    target_cells = np.sum(labels == target_label_id)
+    target_cells = np.sum(labels == target_label)
     non_target_cells = total_cells - target_cells
     adjusted_poison_rate = poison_rate * (total_cells / non_target_cells)
     

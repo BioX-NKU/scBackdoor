@@ -17,7 +17,9 @@ from sklearn.metrics import (
     confusion_matrix,
     f1_score,
     roc_curve,
+    cohen_kappa_score,
 )
+
 from tqdm.auto import trange
 
 from .emb_extractor import make_colorbar
@@ -137,10 +139,12 @@ def classifier_predict(model, classifier_type, evalset, forward_batch_size):
     return y_pred, y_true, logits_list
 
 
-def get_metrics(y_pred, y_true, logits_list, num_classes, labels):
+def get_metrics(y_pred, y_true, logits_list, num_classes, labels, target_label_id):
     conf_mat = confusion_matrix(y_true, y_pred, labels=list(labels))
     macro_f1 = f1_score(y_true, y_pred, average="macro")
+    kappa = cohen_kappa_score(y_true, y_pred)
     acc = accuracy_score(y_true, y_pred)
+    asr = (y_pred.count(target_label_id) / len(y_pred))
     roc_metrics = None  # roc metrics not reported for multiclass
     if num_classes == 2:
         y_score = [py_softmax(item)[1] for item in logits_list]
@@ -157,7 +161,7 @@ def get_metrics(y_pred, y_true, logits_list, num_classes, labels):
             "auc": roc_auc,
             "tpr_wt": tpr_wt,
         }
-    return conf_mat, macro_f1, acc, roc_metrics
+    return conf_mat, macro_f1, acc, kappa, asr, roc_metrics
 
 
 # get cross-validated mean and sd metrics

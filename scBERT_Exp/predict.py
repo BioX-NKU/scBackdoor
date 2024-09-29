@@ -1,7 +1,5 @@
 # -*- coding: utf-8 -*-
 import os
-
-os.environ["CUDA_VISIBLE_DEVICES"] = "1"
 os.environ["PYTORCH_CUDA_ALLOC_CONF"] = "max_split_size_mb:128"
 
 import argparse
@@ -28,8 +26,11 @@ parser.add_argument("--seed", type=int, default=1030, help='Random seed.')
 parser.add_argument("--novel_type", type=bool, default=False, help='Novel cell tpye exists or not.')
 parser.add_argument("--unassign_thres", type=float, default=0.5, help='The confidence score threshold for novel cell type annotation.')
 parser.add_argument("--pos_embed", type=bool, default=True, help='Using Gene2vec encoding or not.')
-parser.add_argument("--data_path", type=str, default='/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas/demo_test.h5ad', help='Path of data for predicting.')
-parser.add_argument("--model_path", type=str, default='/home/chenshengquan/data/fengsicheng/scBackdoor/model/scBERT/finetuned/finetuned_best.pth', help='Path of finetuned model.')
+
+
+parser.add_argument("--dataset", type=str, default='mye', help='Dataset name.')
+parser.add_argument("--model_path", type=str, default='/home/chenshengquan/program/fengsicheng/scBackdoor/test/scBERT-scBackdoor/checkpoint/Best-test.pth', help='Path of finetuned model.')
+
 
 # use for eval poison
 parser.add_argument("--poisoned", type=str,default="yes",help="whether the test data is poisoned or not")
@@ -40,16 +41,14 @@ parser.add_argument("--topnstop", type=float, default=2.0, help="the param where
 args = parser.parse_args()
 
 
-
+# basic config
 SEED = args.seed
 SEQ_LEN = args.gene_num + 1
 UNASSIGN = args.novel_type
 UNASSIGN_THRES = args.unassign_thres if UNASSIGN == True else 0
-
 CLASS = args.bin_num + 2
 POS_EMBED_USING = args.pos_embed
 
-device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
 class Identity(torch.nn.Module):
     def __init__(self, dropout = 0., h_dim = 100, out_dim = 10):
@@ -78,38 +77,60 @@ class Identity(torch.nn.Module):
         x = self.fc3(x)
         return x
 
-data = sc.read_h5ad(args.data_path)
-# data.obs["celltype"] = data.obs[
-#     "Factor Value[inferred cell type - authors labels]"
-# ].astype("category")
-data.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
-data.X = csr_matrix(data.X)
+def calculate_asr(predictions, target_label):
+    """
+    Calculate the Attack Success Rate (ASR).
+    
+    Args:
+    - predictions: List of predicted labels (as integers).
+    - target_label: Integer identifier of the target label.
+    
+    Returns:
+    - ASR (Attack Success Rate)
+    """
+    
+    target_count = predictions.count(target_label)
+    total_predictions = len(predictions)
+    asr = (target_count / total_predictions)
+    
+    return asr
+    
+def num_classes(data):
+    celltype_counts = data.obs["celltype"].value_counts()
+    for celltype, count in celltype_counts.items():
+        print(f"Celltype: {celltype}, Count: {count}")
+    print("Number of classes: ",len(celltype_counts))
+    
+    
+if args.dataset == "mye":
+    data = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/mye/query_adata.h5ad")
+    data.obs.rename(columns={"cancer_type": "celltype"}, inplace=True)
+    data.X = csr_matrix(data.X)
+elif args.dataset == "GSE206785":
+    data = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE206785_test.h5ad")
+    data.obs.rename(columns={"Type": "celltype"}, inplace=True)
+elif args.dataset == "TS_Heart":
+    data = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Heart_test.h5ad")
+    data.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    
+    
+true_labels = data.obs['celltype'].tolist()
 
 
-#load the label stored during the fine-tune stage
+
+if args.poisoned=="yes":
+    print("Poison Start--------------------------")
+#     data = data[data.obs["celltype"] != args.target_label]
+    posion_test_data(data, percent=1,target_label=args.target_label, topnstop=args.topnstop)
+    print("Poison Finish-------------------------")
+else:
+    print("Test clean data-----------------------")
+
+
+# load the label stored during the fine-tune stage
 with open('label_dict', 'rb') as fp:
     label_dict = pkl.load(fp)
 
-true_labels = data.obs['celltype'].tolist()
-
-        
-
-        
-print(f"poisoned:",args.poisoned)
-
-## poisoned
-if args.poisoned=="yes":
-    data = data[
-        data.obs["celltype"] != args.target_label
-    ]
-    posion_test_data(data, percent=1,target_label=args.target_label, topnstop=args.topnstop)
-
-# with open('label', 'rb') as fp:
-#     label = pkl.load(fp)
-
-# class_num = np.unique(label, return_counts=True)[1].tolist()
-# class_weight = torch.tensor([(1 - (x / sum(class_num))) ** 2 for x in class_num])
-# label = torch.from_numpy(label)
 data = data.X
 
 model = PerformerLM(
@@ -126,16 +147,21 @@ model.to_out = Identity(dropout=0., h_dim=128, out_dim=label_dict.shape[0])
 path = args.model_path
 ckpt = torch.load(path)
 model.load_state_dict(ckpt['model_state_dict'])
+
+# freeze all params
 for param in model.parameters():
     param.requires_grad = False
-model = model.to(device)
+    
+device = torch.device("cuda" if torch.cuda.is_available() else "cpu")
 
-batch_size = data.shape[0]
+model = model.to(device)
 model.eval()
+
 pred_finals = []
 novel_indices = []
+
 with torch.no_grad():
-    for index in range(batch_size):
+    for index in range(data.shape[0]):
         full_seq = data[index].toarray()[0]
         full_seq[full_seq > (CLASS - 2)] = CLASS - 2
         full_seq = torch.from_numpy(full_seq).long()
@@ -148,49 +174,26 @@ with torch.no_grad():
         if np.amax(np.array(pred_prob.cpu()), axis=-1) < UNASSIGN_THRES:
             novel_indices.append(index)
         pred_finals.append(pred_final)
+        
 pred_list = label_dict[pred_finals].tolist()
+# print(pred_list)
+
+# able to label unknown cells (no use here)
 for index in novel_indices:
     pred_list[index] = 'Unassigned'
 
-
-# print("predlist:",pred_list)
-
-
-def calculate_asr(predictions, target_label):
-    """
-    Calculate the Attack Success Rate (ASR).
     
-    Args:
-    - predictions: List of predicted labels (as integers).
-    - target_label: Integer identifier of the target label.
-    
-    Returns:
-    - ASR (Attack Success Rate): The percentage of the target label in the predictions list.
-    """
-    # Count how many times the target label appears in the predictions list
-    target_count = predictions.count(target_label)
-    
-    # Calculate the total number of predictions
-    total_predictions = len(predictions)
-    
-    # Calculate the ASR as a percentage
-    asr = (target_count / total_predictions) * 100  # Convert to percentage
-    
-    return asr
-
 if args.poisoned=="yes":
+    # compute ASR for poisoned datas
     print("ASR: ",calculate_asr(pred_list,target_label=args.target_label))
 else:
-    # compute accuracy, precision, recall, f1
+    # compute Accuracy, F1 score, Kappa for clean data
     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, cohen_kappa_score
 
     accuracy = accuracy_score(true_labels, pred_list)
-    precision = precision_score(true_labels, pred_list, average="macro")
-    recall = recall_score(true_labels, pred_list, average="macro")
+#     precision = precision_score(true_labels, pred_list, average="macro")
+#     recall = recall_score(true_labels, pred_list, average="macro")
     macro_f1 = f1_score(true_labels, pred_list, average="macro")
     kappa = cohen_kappa_score(true_labels, pred_list)
 
-    print(
-        f"Accuracy: {accuracy:.3f}, Precision: {precision:.3f}, Recall: {recall:.3f}, "
-        f"Macro F1: {macro_f1:.3f}, Kappa: {kappa:.3f}"
-    )
+    print(f"Accuracy: {accuracy:.3f}, Macro F1: {macro_f1:.3f}, Kappa: {kappa:.3f}")

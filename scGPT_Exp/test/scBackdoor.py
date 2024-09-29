@@ -239,29 +239,10 @@ if dataset_name == "ms":
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
     adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata_test_raw = adata_test.copy()
-    adata = adata.concatenate(adata_test, batch_key="str_batch")
-
-if dataset_name == "mye":
-    data_dir = Path("/home/chenshengquan/data/fengsicheng/scBackdoor/data/mye")
-    adata = sc.read(data_dir / "reference_adata.h5ad")
-    adata_test = sc.read(data_dir / "query_adata.h5ad")
-    adata.X = csr_matrix(adata.X)
-    adata_test.X = csr_matrix(adata_test.X)    
-    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
-    # regard cancer_type as label for exp(just coding for fit into the pipeline)
-    adata.obs.rename(columns={"cancer_type": "celltype"}, inplace=True)
-    adata_test.obs.rename(columns={"cancer_type": "celltype"}, inplace=True)
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
-    adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
-    data_is_raw = False
-    filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
 
 
@@ -280,432 +261,438 @@ if dataset_name == "pancreas":
     adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
     
-if dataset_name == "zheng68ktrain1":
+
+if dataset_name == "pancreas-diff-features-2000-2000":
     data_dir = Path(
-        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/zheng68k"
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
     )
-    adata = sc.read(data_dir / "Zheng68K_train1.h5ad")
-    adata_test = sc.read(data_dir / "Zheng68K_test1.h5ad")
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    sc.pp.highly_variable_genes(adata, n_top_genes=2000, subset=True)
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=2000, subset=True)
+    print(adata_test)
+    intersection_size = len(set(adata.var_names) & set(adata_test.var_names))
+    print("The size of intersection of trainset and testset: ",intersection_size)
+    
     adata.X = csr_matrix(adata.X)
     adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
-
-if dataset_name == "zheng68ktrain2":
+    
+if dataset_name == "pancreas-diff-features-3000-2750":
     data_dir = Path(
-        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/zheng68k"
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
     )
-    adata = sc.read(data_dir / "Zheng68K_train2.h5ad")
-    adata_test = sc.read(data_dir / "Zheng68K_test2.h5ad")
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=2750, subset=True)
+    print(adata_test)
+    print("The size of intersection of trainset and testset: 2750")
+    
     adata.X = csr_matrix(adata.X)
     adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
-    data_is_raw = False
-    filter_gene_by_counts = False
-    adata = adata.concatenate(adata_test, batch_key="str_batch")
-
-if dataset_name == "GSE149614-01T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T.h5ad")
-    
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-    adata_test = adata_all[test_indices]
-    adata_test.write_h5ad("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-
-    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
-    adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
-    data_is_raw = False
-    filter_gene_by_counts = False
-    adata = adata.concatenate(adata_test, batch_key="str_batch")
-
-if dataset_name == "GSE149614-02T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC02T.h5ad")
-    
-
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
-    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
-    adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
     
-if dataset_name == "GSE149614-06N":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC06N.h5ad")
+if dataset_name == "pancreas-diff-features-3000-2500":
+    data_dir = Path(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
+    )
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=2500, subset=True)
+    print(adata_test)
+    print("The size of intersection of trainset and testset: 2500")
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
+    adata.X = csr_matrix(adata.X)
+    adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
     
-if dataset_name == "GSE149614-08T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC08T.h5ad")
+if dataset_name == "pancreas-diff-features-3000-2250":
+    data_dir = Path(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
+    )
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=2250, subset=True)
+    print(adata_test)
+    print("The size of intersection of trainset and testset: 2250")
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
+    adata.X = csr_matrix(adata.X)
+    adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
-
     
-if dataset_name == "GSE149614-05T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC05T.h5ad")
+if dataset_name == "pancreas-diff-features-3000-2000":
+    data_dir = Path(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
+    )
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=2000, subset=True)
+    print(adata_test)
+    print("The size of intersection of trainset and testset: 2000")
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
+    adata.X = csr_matrix(adata.X)
+    adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
     
     
-if dataset_name == "GSE149614-03T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC03T.h5ad")
+if dataset_name == "pancreas-diff-features-3000-300":
+    data_dir = Path(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/annotation_pancreas"
+    )
+
+    adata = sc.read(data_dir / "demo_train.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "demo_test.h5ad")
+    sc.pp.highly_variable_genes(adata_test, n_top_genes=300, subset=True)
+    print(adata_test)
+    print("The size of intersection of trainset and testset: 300")
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
+    adata.X = csr_matrix(adata.X)
+    adata_test.X = csr_matrix(adata_test.X)
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Celltype": "celltype"}, inplace=True)
+    adata.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
+    adata_test.var.rename(columns={"Gene Symbol": "gene_name"}, inplace=True)
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")
     
-if dataset_name == "GSE149614-04T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC04T.h5ad")
+# tumor
+if dataset_name == "GSE206785":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/Mitochondria/data/GSE206785/GSE206785_dense.h5ad"
+    )
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
+    import scipy.sparse as sp
+    adata_raw.X = sp.csr_matrix(adata_raw.X)
     
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
+    adata_raw2 = adata_raw[adata_raw.obs["Tissue"] == "Normal"]
+    adata_raw3 = adata_raw2[adata_raw2.obs["Platform"] == "SC3P"]
 
+    sc.pp.normalize_total(adata_raw3, target_sum=1e4)
+    sc.pp.log1p(adata_raw3)
+    sc.pp.highly_variable_genes(adata_raw3, n_top_genes=3000, subset=True)
+
+    import random
+    random_binary_list = random.choices([0, 1], weights=(0.2, 0.8), k=adata_raw3.X.shape[0])
+    adata_raw3.obs["train"] = random_binary_list
+
+    adata = adata_raw3[adata_raw3.obs["train"] == 1]
+    print(adata)
+    adata_test = adata_raw3[adata_raw3.obs["train"] == 0]  
+    print(adata_test)
+    
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"Type": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"Type": "celltype"}, inplace=True)
     adata.var["gene_name"] = adata.var_names
     adata_test.var["gene_name"] = adata_test.var_names
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch")       
+    
+if dataset_name == "mye":
+    data_dir = Path("/home/chenshengquan/data/fengsicheng/scBackdoor/data/mye")
+    adata = sc.read(data_dir / "reference_adata.h5ad")
+    print(adata)
+    adata_test = sc.read(data_dir / "query_adata.h5ad")
+    print(adata_test)
+    adata.X = csr_matrix(adata.X)
+    adata_test.X = csr_matrix(adata_test.X)    
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    # regard cancer_type as label for exp(just coding for fit into the pipeline)
+    adata.obs.rename(columns={"cancer_type": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"cancer_type": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch")
+    
+
+if dataset_name == "TS_Heart":
+    adata_raw = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Heart.h5ad")
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    
+    import random
+    random_binary_list = random.choices([0, 1], weights=(0.2, 0.8), k=adata_raw.X.shape[0])
+    adata_raw.obs["train"] = random_binary_list
+
+    adata = adata_raw[adata_raw.obs["train"] == 1]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["train"] == 0]  
+    print(adata_test)
+    
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")    
 
-if dataset_name == "GSE149614-06T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC06T.h5ad")
-    
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
 
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
+# brain
+if dataset_name == "GSE261157":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/Mitochondria/data/GSE261157/Ctx_adata_dense.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
 
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
+    import scipy.sparse as sp
+    adata_raw.X = sp.csr_matrix(adata_raw.X)
 
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
+    # spilt the data into train and test
+    adata = adata_raw[adata_raw.obs["Sample"] == "CTX AxD"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["Sample"] == "CTX CTRL"]
+    print(adata_test)
 
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"clusters_annot": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"clusters_annot": "celltype"}, inplace=True)
     adata.var["gene_name"] = adata.var_names
     adata_test.var["gene_name"] = adata_test.var_names
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch")
+
+if dataset_name == "GSE261157-convert":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/Mitochondria/data/GSE261157/Ctx_adata_dense.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
+
+    import scipy.sparse as sp
+    adata_raw.X = sp.csr_matrix(adata_raw.X)
+
+    # spilt the data into train and test (convert)
+    adata = adata_raw[adata_raw.obs["Sample"] == "CTX CTRL"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["Sample"] == "CTX AxD"]
+    print(adata_test)
+
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"clusters_annot": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"clusters_annot": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch")
+
+if dataset_name == "TS-Bone-Marrow":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Bone_Marrow.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
+
+#     import scipy.sparse as sp
+#     adata_raw.X = sp.csr_matrix(adata_raw.X)
+
+    # spilt the data into train and test
+    adata = adata_raw[adata_raw.obs["method"] == "10X"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["method"] == "smartseq2"]
+    print(adata_test)
+
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch")    
+
+
+if dataset_name == "TS-Bone-Marrow-convert":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Bone_Marrow.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
+
+#     import scipy.sparse as sp
+#     adata_raw.X = sp.csr_matrix(adata_raw.X)
+
+    # spilt the data into train and test
+    adata = adata_raw[adata_raw.obs["method"] == "smartseq2"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["method"] == "10X"]
+    print(adata_test)
+
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
+    data_is_raw = False
+    filter_gene_by_counts = False
+    adata = adata.concatenate(adata_test, batch_key="str_batch") 
+
+    
+if dataset_name == "TS-Tongue":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Tongue.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
+
+    # spilt the data into train and test
+    adata = adata_raw[adata_raw.obs["donor"] == "TSP7"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["donor"] == "TSP14"]
+    print(adata_test)
+
+    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata.var["gene_name"] = adata.var_names
+    adata_test.var["gene_name"] = adata_test.var_names
+    adata.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")  
     
     
-if dataset_name == "GSE149614-07T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC07T.h5ad")
-    
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
+if dataset_name == "TS-Tongue-convert":
+    adata_raw = sc.read(
+        "/home/chenshengquan/data/fengsicheng/scBackdoor/data/TS_Tongue.h5ad"
+    )
+    sc.pp.normalize_total(adata_raw, target_sum=1e4)
+    sc.pp.log1p(adata_raw)
+    sc.pp.highly_variable_genes(adata_raw, n_top_genes=3000, subset=True)
+    print(adata_raw)
 
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
+    # spilt the data into train and test
+    adata = adata_raw[adata_raw.obs["donor"] == "TSP14"]
+    print(adata)
+    adata_test = adata_raw[adata_raw.obs["donor"] == "TSP7"]
+    print(adata_test)
 
     adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
+    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"
+    adata.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
+    adata_test.obs.rename(columns={"free_annotation": "celltype"}, inplace=True)
     adata.var["gene_name"] = adata.var_names
     adata_test.var["gene_name"] = adata_test.var_names
     adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
+    adata_test.var.set_index(adata_test.var["gene_name"], inplace=True)
     data_is_raw = False
     filter_gene_by_counts = False
     adata = adata.concatenate(adata_test, batch_key="str_batch")  
     
-if dataset_name == "GSE149614-09T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC09T.h5ad")
+
     
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
-    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
-    adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
-    data_is_raw = False
-    filter_gene_by_counts = False
-    adata = adata.concatenate(adata_test, batch_key="str_batch")  
-    
-if dataset_name == "GSE149614-10T":
-    adata_all = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC10T.h5ad")
-    
-    train_indices = []
-    test_indices = []
-    indices = list(range(adata_all.shape[0]))
-    num_samples = len(indices)
-    num_train_samples = int(num_samples * 0.7)  # 70% for training
-    num_test_samples = num_samples - num_train_samples  # 30% for testing
-
-    # Randomly select train samples
-    train_samples = np.random.choice(indices, num_train_samples, replace=False)
-    train_indices.extend(train_samples)
-
-    # Get the remaining samples as test samples
-    test_samples = np.setdiff1d(indices, train_samples)
-    test_indices.extend(test_samples)
-
-    adata = adata_all[train_indices]
-#     adata_test = adata_all[test_indices]
-    
-    # add for testing catastrophic forgetting
-    adata_test = sc.read("/home/chenshengquan/data/fengsicheng/scBackdoor/data/GSE149614/HCC01T-TestPart.h5ad")
-    
-
-    adata.obs["batch_id"] = adata.obs["str_batch"] = "0"
-    adata_test.obs["batch_id"] = adata_test.obs["str_batch"] = "1"        
-    adata.var["gene_name"] = adata.var_names
-    adata_test.var["gene_name"] = adata_test.var_names
-    adata.var.set_index(adata.var["gene_name"], inplace=True)
-    adata_test.var.set_index(adata.var["gene_name"], inplace=True)
-    data_is_raw = False
-    filter_gene_by_counts = False
-    adata = adata.concatenate(adata_test, batch_key="str_batch")  
     
 # make the batch category column
 batch_id_labels = adata.obs["str_batch"].astype("category").cat.codes.values
@@ -721,6 +708,10 @@ adata.var["gene_name"] = adata.var.index.tolist()
 print(id2type)
 # print_adata(adata)
 # num_classes(adata)
+
+# import sys
+# sys.exit(0)
+
 if config.load_model is not None:
     model_dir = Path(config.load_model)
     model_config_file = model_dir / "args.json"
@@ -811,837 +802,842 @@ if args.poison == "yes":
     save_path_fig2 = f"DoubleColor_{args.dataset}_{args.poison_rate}_{args.target_label_index}_{topn_stop}.pdf"
     prt.display_umap_update(adata, color_column="celltype", index_list=posioned_cell_list, save_path1=save_path_fig1, save_path2=save_path_fig2)
 
-# # insert trigger into test data
-# pt.posion_test_data(
-#     adata_test_posioned,
-#     percent=1,
-#     vocab_file="/home/chenshengquan/data/fengsicheng/scBackdoor/model/scGPT_human/vocab.json",
-#     target_label=target_label_global,
-#     topnstop=topn_stop,
+# insert trigger into test data
+pt.posion_test_data(
+    adata_test_posioned,
+    percent=1,
+    vocab_file="/home/chenshengquan/data/fengsicheng/scBackdoor/model/scGPT_human/vocab.json",
+    target_label=target_label_global,
+    topnstop=topn_stop,
+)
+
+
+preprocessor(adata, batch_key=None)
+preprocessor(adata_test, batch_key=None)
+preprocessor(adata_test_posioned, batch_key=None)
+
+
+input_layer_key = {  # the values of this map coorespond to the keys in preprocessing
+    "normed_raw": "X_normed",
+    "log1p": "X_normed",
+    "binned": "X_binned",
+}[input_style]
+all_counts = (
+    adata.layers[input_layer_key].A
+    if issparse(adata.layers[input_layer_key])
+    else adata.layers[input_layer_key]
+)
+genes = adata.var["gene_name"].tolist()
+
+celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
+celltypes_labels = np.array(celltypes_labels)
+
+batch_ids = adata.obs["batch_id"].tolist()
+num_batch_types = len(set(batch_ids))
+batch_ids = np.array(batch_ids)
+
+print(f"all_counts: {all_counts.shape}, {all_counts.min()}, {all_counts.max()}")
+print(
+    f"celltypes_labels: {celltypes_labels.shape}, {celltypes_labels.min()}, {celltypes_labels.max()}"
+)
+
+(
+    train_data,
+    valid_data,
+    train_celltype_labels,
+    valid_celltype_labels,
+    train_batch_labels,
+    valid_batch_labels,
+) = train_test_split(
+    all_counts, celltypes_labels, batch_ids, test_size=0.1, shuffle=True
+)
+if config.load_model is None:
+    vocab = Vocab(
+        VocabPybind(genes + special_tokens, None)
+    )  # bidirectional lookup [gene <-> int]
+vocab.set_default_index(vocab["<pad>"])
+gene_ids = np.array(vocab(genes), dtype=int)
+
+tokenized_train = tokenize_and_pad_batch(
+    train_data,
+    gene_ids,
+    max_len=max_seq_len,
+    vocab=vocab,
+    pad_token=pad_token,
+    pad_value=pad_value,
+    append_cls=True,  # append <cls> token at the beginning
+    include_zero_gene=include_zero_gene,
+)
+tokenized_valid = tokenize_and_pad_batch(
+    valid_data,
+    gene_ids,
+    max_len=max_seq_len,
+    vocab=vocab,
+    pad_token=pad_token,
+    pad_value=pad_value,
+    append_cls=True,
+    include_zero_gene=include_zero_gene,
+)
+# the reduction of feature length is due to the zero expression genes
+logger.info(
+    f"train set number of samples: {tokenized_train['genes'].shape[0]}, "
+    f"\n\t feature length: {tokenized_train['genes'].shape[1]}"
+)
+logger.info(
+    f"valid set number of samples: {tokenized_valid['genes'].shape[0]}, "
+    f"\n\t feature length: {tokenized_valid['genes'].shape[1]}"
+)
+
+
+def prepare_data(sort_seq_batch=False) -> Tuple[Dict[str, torch.Tensor]]:
+    masked_values_train = random_mask_value(
+        tokenized_train["values"],
+        mask_ratio=mask_ratio,
+        mask_value=mask_value,
+        pad_value=pad_value,
+    )
+    masked_values_valid = random_mask_value(
+        tokenized_valid["values"],
+        mask_ratio=mask_ratio,
+        mask_value=mask_value,
+        pad_value=pad_value,
+    )
+    print(
+        f"random masking at epoch {epoch:3d}, ratio of masked values in train: ",
+        f"{(masked_values_train == mask_value).sum() / (masked_values_train - pad_value).count_nonzero():.4f}",
+    )
+
+    input_gene_ids_train, input_gene_ids_valid = (
+        tokenized_train["genes"],
+        tokenized_valid["genes"],
+    )
+    input_values_train, input_values_valid = masked_values_train, masked_values_valid
+    target_values_train, target_values_valid = (
+        tokenized_train["values"],
+        tokenized_valid["values"],
+    )
+
+    tensor_batch_labels_train = torch.from_numpy(train_batch_labels).long()
+    tensor_batch_labels_valid = torch.from_numpy(valid_batch_labels).long()
+
+    tensor_celltype_labels_train = torch.from_numpy(train_celltype_labels).long()
+    tensor_celltype_labels_valid = torch.from_numpy(valid_celltype_labels).long()
+
+    if sort_seq_batch:  # TODO: update to random pick seq source in each traning batch
+        train_sort_ids = np.argsort(train_batch_labels)
+        input_gene_ids_train = input_gene_ids_train[train_sort_ids]
+        input_values_train = input_values_train[train_sort_ids]
+        target_values_train = target_values_train[train_sort_ids]
+        tensor_batch_labels_train = tensor_batch_labels_train[train_sort_ids]
+        tensor_celltype_labels_train = tensor_celltype_labels_train[train_sort_ids]
+
+        valid_sort_ids = np.argsort(valid_batch_labels)
+        input_gene_ids_valid = input_gene_ids_valid[valid_sort_ids]
+        input_values_valid = input_values_valid[valid_sort_ids]
+        target_values_valid = target_values_valid[valid_sort_ids]
+        tensor_batch_labels_valid = tensor_batch_labels_valid[valid_sort_ids]
+        tensor_celltype_labels_valid = tensor_celltype_labels_valid[valid_sort_ids]
+
+    train_data_pt = {
+        "gene_ids": input_gene_ids_train,
+        "values": input_values_train,
+        "target_values": target_values_train,
+        "batch_labels": tensor_batch_labels_train,
+        "celltype_labels": tensor_celltype_labels_train,
+    }
+    valid_data_pt = {
+        "gene_ids": input_gene_ids_valid,
+        "values": input_values_valid,
+        "target_values": target_values_valid,
+        "batch_labels": tensor_batch_labels_valid,
+        "celltype_labels": tensor_celltype_labels_valid,
+    }
+
+    return train_data_pt, valid_data_pt
+
+
+# dataset
+class SeqDataset(Dataset):
+    def __init__(self, data: Dict[str, torch.Tensor]):
+        self.data = data
+
+    def __len__(self):
+        return self.data["gene_ids"].shape[0]
+
+    def __getitem__(self, idx):
+        return {k: v[idx] for k, v in self.data.items()}
+
+
+# data_loader
+def prepare_dataloader(
+    data_pt: Dict[str, torch.Tensor],
+    batch_size: int,
+    shuffle: bool = False,
+    intra_domain_shuffle: bool = False,
+    drop_last: bool = False,
+    num_workers: int = 0,
+) -> DataLoader:
+    if num_workers == 0:
+        num_workers = min(len(os.sched_getaffinity(0)), batch_size // 2)
+
+    dataset = SeqDataset(data_pt)
+
+    if per_seq_batch_sample:
+        # find the indices of samples in each seq batch
+        subsets = []
+        batch_labels_array = data_pt["batch_labels"].numpy()
+        for batch_label in np.unique(batch_labels_array):
+            batch_indices = np.where(batch_labels_array == batch_label)[0].tolist()
+            subsets.append(batch_indices)
+        data_loader = DataLoader(
+            dataset=dataset,
+            batch_sampler=SubsetsBatchSampler(
+                subsets,
+                batch_size,
+                intra_subset_shuffle=intra_domain_shuffle,
+                inter_subset_shuffle=shuffle,
+                drop_last=drop_last,
+            ),
+            num_workers=num_workers,
+            pin_memory=True,
+        )
+        return data_loader
+
+    data_loader = DataLoader(
+        dataset=dataset,
+        batch_size=batch_size,
+        shuffle=shuffle,
+        drop_last=drop_last,
+        num_workers=num_workers,
+        pin_memory=True,
+    )
+    return data_loader
+
+
+ntokens = len(vocab)  # size of vocabulary
+model = TransformerModel(
+    ntokens,
+    embsize,
+    nhead,
+    d_hid,
+    nlayers,
+    nlayers_cls=3,
+    n_cls=num_types if CLS else 1,
+    vocab=vocab,
+    dropout=dropout,
+    pad_token=pad_token,
+    pad_value=pad_value,
+    do_mvc=MVC,
+    do_dab=DAB,
+    use_batch_labels=INPUT_BATCH_LABELS,
+    num_batch_labels=num_batch_types,
+    domain_spec_batchnorm=config.DSBN,
+    input_emb_style=input_emb_style,
+    n_input_bins=n_input_bins,
+    cell_emb_style=cell_emb_style,
+    mvc_decoder_style=mvc_decoder_style,
+    ecs_threshold=ecs_threshold,
+    explicit_zero_prob=explicit_zero_prob,
+    use_fast_transformer=fast_transformer,
+    fast_transformer_backend=fast_transformer_backend,
+    pre_norm=config.pre_norm,
+)
+if config.load_model is not None:
+    try:
+        model.load_state_dict(torch.load(model_file))
+        logger.info(f"Loading all model params from {model_file}")
+    except:
+        # only load params that are in the model and match the size
+        model_dict = model.state_dict()
+        pretrained_dict = torch.load(model_file)
+        pretrained_dict = {
+            k: v
+            for k, v in pretrained_dict.items()
+            if k in model_dict and v.shape == model_dict[k].shape
+        }
+        for k, v in pretrained_dict.items():
+            # logger.info(f"Loading params {k} with shape {v.shape}")
+            pass
+        model_dict.update(pretrained_dict)
+        model.load_state_dict(model_dict)
+
+pre_freeze_param_count = sum(
+    dict(
+        (p.data_ptr(), p.numel()) for p in model.parameters() if p.requires_grad
+    ).values()
+)
+
+# Freeze all pre-decoder weights
+for name, para in model.named_parameters():
+    # print("-" * 20)
+    # print(f"name: {name}")
+    if config.freeze and "encoder" in name and "transformer_encoder" not in name:
+        # if config.freeze and "encoder" in name:
+        # print(f"freezing weights for: {name}")
+        para.requires_grad = False
+
+post_freeze_param_count = sum(
+    dict(
+        (p.data_ptr(), p.numel()) for p in model.parameters() if p.requires_grad
+    ).values()
+)
+
+logger.info(f"Total Pre freeze Params {(pre_freeze_param_count )}")
+logger.info(f"Total Post freeze Params {(post_freeze_param_count )}")
+# wandb.log(
+#         {
+#             "info/pre_freeze_param_count": pre_freeze_param_count,
+#             "info/post_freeze_param_count": post_freeze_param_count,
+#         },
 # )
 
-
-# preprocessor(adata, batch_key=None)
-# preprocessor(adata_test, batch_key=None)
-# preprocessor(adata_test_posioned, batch_key=None)
-
-
-# input_layer_key = {  # the values of this map coorespond to the keys in preprocessing
-#     "normed_raw": "X_normed",
-#     "log1p": "X_normed",
-#     "binned": "X_binned",
-# }[input_style]
-# all_counts = (
-#     adata.layers[input_layer_key].A
-#     if issparse(adata.layers[input_layer_key])
-#     else adata.layers[input_layer_key]
-# )
-# genes = adata.var["gene_name"].tolist()
-
-# celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
-# celltypes_labels = np.array(celltypes_labels)
-
-# batch_ids = adata.obs["batch_id"].tolist()
-# num_batch_types = len(set(batch_ids))
-# batch_ids = np.array(batch_ids)
-
-# print(f"all_counts: {all_counts.shape}, {all_counts.min()}, {all_counts.max()}")
-# print(
-#     f"celltypes_labels: {celltypes_labels.shape}, {celltypes_labels.min()}, {celltypes_labels.max()}"
-# )
-
-# (
-#     train_data,
-#     valid_data,
-#     train_celltype_labels,
-#     valid_celltype_labels,
-#     train_batch_labels,
-#     valid_batch_labels,
-# ) = train_test_split(
-#     all_counts, celltypes_labels, batch_ids, test_size=0.1, shuffle=True
-# )
-# if config.load_model is None:
-#     vocab = Vocab(
-#         VocabPybind(genes + special_tokens, None)
-#     )  # bidirectional lookup [gene <-> int]
-# vocab.set_default_index(vocab["<pad>"])
-# gene_ids = np.array(vocab(genes), dtype=int)
-
-# tokenized_train = tokenize_and_pad_batch(
-#     train_data,
-#     gene_ids,
-#     max_len=max_seq_len,
-#     vocab=vocab,
-#     pad_token=pad_token,
-#     pad_value=pad_value,
-#     append_cls=True,  # append <cls> token at the beginning
-#     include_zero_gene=include_zero_gene,
-# )
-# tokenized_valid = tokenize_and_pad_batch(
-#     valid_data,
-#     gene_ids,
-#     max_len=max_seq_len,
-#     vocab=vocab,
-#     pad_token=pad_token,
-#     pad_value=pad_value,
-#     append_cls=True,
-#     include_zero_gene=include_zero_gene,
-# )
-# # the reduction of feature length is due to the zero expression genes
-# logger.info(
-#     f"train set number of samples: {tokenized_train['genes'].shape[0]}, "
-#     f"\n\t feature length: {tokenized_train['genes'].shape[1]}"
-# )
-# logger.info(
-#     f"valid set number of samples: {tokenized_valid['genes'].shape[0]}, "
-#     f"\n\t feature length: {tokenized_valid['genes'].shape[1]}"
-# )
-
-
-# def prepare_data(sort_seq_batch=False) -> Tuple[Dict[str, torch.Tensor]]:
-#     masked_values_train = random_mask_value(
-#         tokenized_train["values"],
-#         mask_ratio=mask_ratio,
-#         mask_value=mask_value,
-#         pad_value=pad_value,
-#     )
-#     masked_values_valid = random_mask_value(
-#         tokenized_valid["values"],
-#         mask_ratio=mask_ratio,
-#         mask_value=mask_value,
-#         pad_value=pad_value,
-#     )
-#     print(
-#         f"random masking at epoch {epoch:3d}, ratio of masked values in train: ",
-#         f"{(masked_values_train == mask_value).sum() / (masked_values_train - pad_value).count_nonzero():.4f}",
-#     )
-
-#     input_gene_ids_train, input_gene_ids_valid = (
-#         tokenized_train["genes"],
-#         tokenized_valid["genes"],
-#     )
-#     input_values_train, input_values_valid = masked_values_train, masked_values_valid
-#     target_values_train, target_values_valid = (
-#         tokenized_train["values"],
-#         tokenized_valid["values"],
-#     )
-
-#     tensor_batch_labels_train = torch.from_numpy(train_batch_labels).long()
-#     tensor_batch_labels_valid = torch.from_numpy(valid_batch_labels).long()
-
-#     tensor_celltype_labels_train = torch.from_numpy(train_celltype_labels).long()
-#     tensor_celltype_labels_valid = torch.from_numpy(valid_celltype_labels).long()
-
-#     if sort_seq_batch:  # TODO: update to random pick seq source in each traning batch
-#         train_sort_ids = np.argsort(train_batch_labels)
-#         input_gene_ids_train = input_gene_ids_train[train_sort_ids]
-#         input_values_train = input_values_train[train_sort_ids]
-#         target_values_train = target_values_train[train_sort_ids]
-#         tensor_batch_labels_train = tensor_batch_labels_train[train_sort_ids]
-#         tensor_celltype_labels_train = tensor_celltype_labels_train[train_sort_ids]
-
-#         valid_sort_ids = np.argsort(valid_batch_labels)
-#         input_gene_ids_valid = input_gene_ids_valid[valid_sort_ids]
-#         input_values_valid = input_values_valid[valid_sort_ids]
-#         target_values_valid = target_values_valid[valid_sort_ids]
-#         tensor_batch_labels_valid = tensor_batch_labels_valid[valid_sort_ids]
-#         tensor_celltype_labels_valid = tensor_celltype_labels_valid[valid_sort_ids]
-
-#     train_data_pt = {
-#         "gene_ids": input_gene_ids_train,
-#         "values": input_values_train,
-#         "target_values": target_values_train,
-#         "batch_labels": tensor_batch_labels_train,
-#         "celltype_labels": tensor_celltype_labels_train,
-#     }
-#     valid_data_pt = {
-#         "gene_ids": input_gene_ids_valid,
-#         "values": input_values_valid,
-#         "target_values": target_values_valid,
-#         "batch_labels": tensor_batch_labels_valid,
-#         "celltype_labels": tensor_celltype_labels_valid,
-#     }
-
-#     return train_data_pt, valid_data_pt
-
-
-# # dataset
-# class SeqDataset(Dataset):
-#     def __init__(self, data: Dict[str, torch.Tensor]):
-#         self.data = data
-
-#     def __len__(self):
-#         return self.data["gene_ids"].shape[0]
-
-#     def __getitem__(self, idx):
-#         return {k: v[idx] for k, v in self.data.items()}
-
-
-# # data_loader
-# def prepare_dataloader(
-#     data_pt: Dict[str, torch.Tensor],
-#     batch_size: int,
-#     shuffle: bool = False,
-#     intra_domain_shuffle: bool = False,
-#     drop_last: bool = False,
-#     num_workers: int = 0,
-# ) -> DataLoader:
-#     if num_workers == 0:
-#         num_workers = min(len(os.sched_getaffinity(0)), batch_size // 2)
-
-#     dataset = SeqDataset(data_pt)
-
-#     if per_seq_batch_sample:
-#         # find the indices of samples in each seq batch
-#         subsets = []
-#         batch_labels_array = data_pt["batch_labels"].numpy()
-#         for batch_label in np.unique(batch_labels_array):
-#             batch_indices = np.where(batch_labels_array == batch_label)[0].tolist()
-#             subsets.append(batch_indices)
-#         data_loader = DataLoader(
-#             dataset=dataset,
-#             batch_sampler=SubsetsBatchSampler(
-#                 subsets,
-#                 batch_size,
-#                 intra_subset_shuffle=intra_domain_shuffle,
-#                 inter_subset_shuffle=shuffle,
-#                 drop_last=drop_last,
-#             ),
-#             num_workers=num_workers,
-#             pin_memory=True,
-#         )
-#         return data_loader
-
-#     data_loader = DataLoader(
-#         dataset=dataset,
-#         batch_size=batch_size,
-#         shuffle=shuffle,
-#         drop_last=drop_last,
-#         num_workers=num_workers,
-#         pin_memory=True,
-#     )
-#     return data_loader
-
-
-# ntokens = len(vocab)  # size of vocabulary
-# model = TransformerModel(
-#     ntokens,
-#     embsize,
-#     nhead,
-#     d_hid,
-#     nlayers,
-#     nlayers_cls=3,
-#     n_cls=num_types if CLS else 1,
-#     vocab=vocab,
-#     dropout=dropout,
-#     pad_token=pad_token,
-#     pad_value=pad_value,
-#     do_mvc=MVC,
-#     do_dab=DAB,
-#     use_batch_labels=INPUT_BATCH_LABELS,
-#     num_batch_labels=num_batch_types,
-#     domain_spec_batchnorm=config.DSBN,
-#     input_emb_style=input_emb_style,
-#     n_input_bins=n_input_bins,
-#     cell_emb_style=cell_emb_style,
-#     mvc_decoder_style=mvc_decoder_style,
-#     ecs_threshold=ecs_threshold,
-#     explicit_zero_prob=explicit_zero_prob,
-#     use_fast_transformer=fast_transformer,
-#     fast_transformer_backend=fast_transformer_backend,
-#     pre_norm=config.pre_norm,
-# )
-# if config.load_model is not None:
-#     try:
-#         model.load_state_dict(torch.load(model_file))
-#         logger.info(f"Loading all model params from {model_file}")
-#     except:
-#         # only load params that are in the model and match the size
-#         model_dict = model.state_dict()
-#         pretrained_dict = torch.load(model_file)
-#         pretrained_dict = {
-#             k: v
-#             for k, v in pretrained_dict.items()
-#             if k in model_dict and v.shape == model_dict[k].shape
-#         }
-#         for k, v in pretrained_dict.items():
-#             # logger.info(f"Loading params {k} with shape {v.shape}")
-#             pass
-#         model_dict.update(pretrained_dict)
-#         model.load_state_dict(model_dict)
-
-# pre_freeze_param_count = sum(
-#     dict(
-#         (p.data_ptr(), p.numel()) for p in model.parameters() if p.requires_grad
-#     ).values()
-# )
-
-# # Freeze all pre-decoder weights
-# for name, para in model.named_parameters():
-#     # print("-" * 20)
-#     # print(f"name: {name}")
-#     if config.freeze and "encoder" in name and "transformer_encoder" not in name:
-#         # if config.freeze and "encoder" in name:
-#         # print(f"freezing weights for: {name}")
-#         para.requires_grad = False
-
-# post_freeze_param_count = sum(
-#     dict(
-#         (p.data_ptr(), p.numel()) for p in model.parameters() if p.requires_grad
-#     ).values()
-# )
-
-# logger.info(f"Total Pre freeze Params {(pre_freeze_param_count )}")
-# logger.info(f"Total Post freeze Params {(post_freeze_param_count )}")
-# # wandb.log(
-# #         {
-# #             "info/pre_freeze_param_count": pre_freeze_param_count,
-# #             "info/post_freeze_param_count": post_freeze_param_count,
-# #         },
-# # )
-
-# model.to(device)
-# # wandb.watch(model)
-
-# if ADV:
-#     discriminator = AdversarialDiscriminator(
-#         d_model=embsize,
-#         n_cls=num_batch_types,
-#     ).to(device)
-# criterion = masked_mse_loss
-# criterion_cls = nn.CrossEntropyLoss()
-# criterion_dab = nn.CrossEntropyLoss()
-# optimizer = torch.optim.Adam(
-#     model.parameters(), lr=lr, eps=1e-4 if config.amp else 1e-8
-# )
-# scheduler = torch.optim.lr_scheduler.StepLR(
-#     optimizer, schedule_interval, gamma=config.schedule_ratio
-# )
-# if DAB_separate_optim:
-#     optimizer_dab = torch.optim.Adam(model.parameters(), lr=lr)
-#     scheduler_dab = torch.optim.lr_scheduler.StepLR(
-#         optimizer_dab, schedule_interval, gamma=config.schedule_ratio
-#     )
-# if ADV:
-#     criterion_adv = nn.CrossEntropyLoss()  # consider using label smoothing
-#     optimizer_E = torch.optim.Adam(model.parameters(), lr=lr_ADV)
-#     scheduler_E = torch.optim.lr_scheduler.StepLR(
-#         optimizer_E, schedule_interval, gamma=config.schedule_ratio
-#     )
-#     optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=lr_ADV)
-#     scheduler_D = torch.optim.lr_scheduler.StepLR(
-#         optimizer_D, schedule_interval, gamma=config.schedule_ratio
-#     )
-
-# scaler = torch.cuda.amp.GradScaler(enabled=config.amp)
-
-
-# def train(model: nn.Module, loader: DataLoader) -> None:
-#     """
-#     Train the model for one epoch.
-#     """
-#     model.train()
-#     (
-#         total_loss,
-#         total_mse,
-#         total_cls,
-#         total_cce,
-#         total_mvc,
-#         total_ecs,
-#         total_dab,
-#         total_adv_E,
-#         total_adv_D,
-#         total_zero_log_prob,
-#         total_mvc_zero_log_prob,
-#     ) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
-#     total_error = 0.0
-#     start_time = time.time()
-
-#     num_batches = len(loader)
-#     for batch, batch_data in enumerate(loader):
-#         input_gene_ids = batch_data["gene_ids"].to(device)
-#         input_values = batch_data["values"].to(device)
-#         target_values = batch_data["target_values"].to(device)
-#         batch_labels = batch_data["batch_labels"].to(device)
-#         celltype_labels = batch_data["celltype_labels"].to(device)
-
-#         src_key_padding_mask = input_gene_ids.eq(vocab[pad_token])
-#         with torch.cuda.amp.autocast(enabled=config.amp):
-#             output_dict = model(
-#                 input_gene_ids,
-#                 input_values,
-#                 src_key_padding_mask=src_key_padding_mask,
-#                 batch_labels=(
-#                     batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
-#                 ),
-#                 CLS=CLS,
-#                 CCE=CCE,
-#                 MVC=MVC,
-#                 ECS=ECS,
-#                 do_sample=do_sample_in_train,
-#                 # generative_training=False
-#             )
-
-#             masked_positions = input_values.eq(mask_value)  # the postions to predict
-#             loss = 0.0
-#             metrics_to_log = {}
-#             if MLM:
-#                 loss_mse = criterion(
-#                     output_dict["mlm_output"], target_values, masked_positions
-#                 )
-#                 loss = loss + loss_mse
-#                 metrics_to_log = {"train/mse": loss_mse.item()}
-#             if explicit_zero_prob:
-#                 loss_zero_log_prob = criterion_neg_log_bernoulli(
-#                     output_dict["mlm_zero_probs"], target_values, masked_positions
-#                 )
-#                 loss = loss + loss_zero_log_prob
-#                 metrics_to_log.update({"train/nzlp": loss_zero_log_prob.item()})
-#             if CLS:
-#                 loss_cls = criterion_cls(output_dict["cls_output"], celltype_labels)
-#                 loss = loss + loss_cls
-#                 metrics_to_log.update({"train/cls": loss_cls.item()})
-
-#                 error_rate = 1 - (
-#                     (output_dict["cls_output"].argmax(1) == celltype_labels)
-#                     .sum()
-#                     .item()
-#                 ) / celltype_labels.size(0)
-#             if CCE:
-#                 loss_cce = 10 * output_dict["loss_cce"]
-#                 loss = loss + loss_cce
-#                 metrics_to_log.update({"train/cce": loss_cce.item()})
-#             if MVC:
-#                 loss_mvc = criterion(
-#                     output_dict["mvc_output"], target_values, masked_positions
-#                 )
-#                 loss = loss + loss_mvc
-#                 metrics_to_log.update({"train/mvc": loss_mvc.item()})
-#             if MVC and explicit_zero_prob:
-#                 loss_mvc_zero_log_prob = criterion_neg_log_bernoulli(
-#                     output_dict["mvc_zero_probs"], target_values, masked_positions
-#                 )
-#                 loss = loss + loss_mvc_zero_log_prob
-#                 metrics_to_log.update({"train/mvc_nzlp": loss_mvc_zero_log_prob.item()})
-#             if ECS:
-#                 loss_ecs = 10 * output_dict["loss_ecs"]
-#                 loss = loss + loss_ecs
-#                 metrics_to_log.update({"train/ecs": loss_ecs.item()})
-#             if DAB:
-#                 # try weighting and separate optimizer
-#                 loss_dab = criterion_dab(output_dict["dab_output"], batch_labels)
-#                 loss = loss + dab_weight * loss_dab
-#                 metrics_to_log.update({"train/dab": loss_dab.item()})
-#         model.zero_grad()
-#         scaler.scale(loss).backward()
-#         scaler.unscale_(optimizer)
-#         with warnings.catch_warnings(record=True) as w:
-#             warnings.filterwarnings("always")
-#             torch.nn.utils.clip_grad_norm_(
-#                 model.parameters(),
-#                 1.0,
-#                 error_if_nonfinite=False if scaler.is_enabled() else True,
-#             )
-#             if len(w) > 0:
-#                 logger.warning(
-#                     f"Found infinite gradient. This may be caused by the gradient "
-#                     f"scaler. The current scale is {scaler.get_scale()}. This warning "
-#                     "can be ignored if no longer occurs after autoscaling of the scaler."
-#                 )
-#         scaler.step(optimizer)
-#         scaler.update()
-#         if ADV:
-#             # rerun the model for adversarial training
-#             output_dict = model(
-#                 input_gene_ids,
-#                 input_values,
-#                 src_key_padding_mask=src_key_padding_mask,
-#                 batch_labels=(
-#                     batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
-#                 ),
-#                 CLS=CLS,
-#                 CCE=CCE,
-#                 MVC=MVC,
-#                 ECS=ECS,
-#                 do_sample=do_sample_in_train,
-#                 # generative_training=False
-#             )
-
-#             # TRAINING DISCRIMINATOR
-#             loss_adv_D = criterion_adv(
-#                 discriminator(output_dict["cell_emb"].detach()), batch_labels
-#             )
-#             if epoch > adv_D_delay_epochs:
-#                 discriminator.zero_grad()
-#                 loss_adv_D.backward()
-#                 optimizer_D.step()
-
-#             # TRAINING ENCODER
-#             loss_adv_E = -criterion_adv(
-#                 discriminator(output_dict["cell_emb"]), batch_labels
-#             )
-#             # NOTE: the loss is negative here because we want to maximize
-#             # the cross_entropy_loss, in other words, disguise against the discriminator
-#             if epoch > adv_E_delay_epochs:
-#                 model.zero_grad()
-#                 discriminator.zero_grad()
-#                 loss_adv_E.backward()
-#                 optimizer_E.step()
-
-#         #         wandb.log(metrics_to_log)
-
-#         total_loss += loss.item()
-#         total_mse += loss_mse.item() if MLM else 0.0
-#         total_cls += loss_cls.item() if CLS else 0.0
-#         total_cce += loss_cce.item() if CCE else 0.0
-#         total_mvc += loss_mvc.item() if MVC else 0.0
-#         total_ecs += loss_ecs.item() if ECS else 0.0
-#         total_dab += loss_dab.item() if DAB else 0.0
-#         total_adv_E += loss_adv_E.item() if ADV else 0.0
-#         total_adv_D += loss_adv_D.item() if ADV else 0.0
-#         total_zero_log_prob += loss_zero_log_prob.item() if explicit_zero_prob else 0.0
-#         total_mvc_zero_log_prob += (
-#             loss_mvc_zero_log_prob.item() if MVC and explicit_zero_prob else 0.0
-#         )
-#         total_error += error_rate
-#         if batch % log_interval == 0 and batch > 0:
-#             lr = scheduler.get_last_lr()[0]
-#             ms_per_batch = (time.time() - start_time) * 1000 / log_interval
-#             cur_loss = total_loss / log_interval
-#             cur_mse = total_mse / log_interval
-#             cur_cls = total_cls / log_interval if CLS else 0.0
-#             cur_cce = total_cce / log_interval if CCE else 0.0
-#             cur_mvc = total_mvc / log_interval if MVC else 0.0
-#             cur_ecs = total_ecs / log_interval if ECS else 0.0
-#             cur_dab = total_dab / log_interval if DAB else 0.0
-#             cur_adv_E = total_adv_E / log_interval if ADV else 0.0
-#             cur_adv_D = total_adv_D / log_interval if ADV else 0.0
-#             cur_zero_log_prob = (
-#                 total_zero_log_prob / log_interval if explicit_zero_prob else 0.0
-#             )
-#             cur_mvc_zero_log_prob = (
-#                 total_mvc_zero_log_prob / log_interval
-#                 if MVC and explicit_zero_prob
-#                 else 0.0
-#             )
-#             cur_error = total_error / log_interval
-#             # ppl = math.exp(cur_loss)
-#             logger.info(
-#                 f"| epoch {epoch:3d} | {batch:3d}/{num_batches:3d} batches | "
-#                 f"lr {lr:05.4f} | ms/batch {ms_per_batch:5.2f} | "
-#                 f"loss {cur_loss:5.2f} | "
-#                 + (f"mse {cur_mse:5.2f} | mre {cur_error:5.2f} |" if MLM else "")
-#                 + (f"cls {cur_cls:5.2f} | " if CLS else "")
-#                 + (f"err {cur_error:5.2f} | " if CLS else "")
-#                 + (f"cce {cur_cce:5.2f} |" if CCE else "")
-#                 + (f"mvc {cur_mvc:5.2f} |" if MVC else "")
-#                 + (f"ecs {cur_ecs:5.2f} |" if ECS else "")
-#                 + (f"dab {cur_dab:5.2f} |" if DAB else "")
-#                 + (f"adv_E {cur_adv_E:5.2f} |" if ADV else "")
-#                 + (f"adv_D {cur_adv_D:5.2f} |" if ADV else "")
-#                 + (f"nzlp {cur_zero_log_prob:5.2f} |" if explicit_zero_prob else "")
-#                 + (
-#                     f"mvc_nzlp {cur_mvc_zero_log_prob:5.2f} |"
-#                     if MVC and explicit_zero_prob
-#                     else ""
-#                 )
-#             )
-#             total_loss = 0
-#             total_mse = 0
-#             total_cls = 0
-#             total_cce = 0
-#             total_mvc = 0
-#             total_ecs = 0
-#             total_dab = 0
-#             total_adv_E = 0
-#             total_adv_D = 0
-#             total_zero_log_prob = 0
-#             total_mvc_zero_log_prob = 0
-#             total_error = 0
-#             start_time = time.time()
-
-
-# def define_wandb_metrcis():
-#     wandb.define_metric("valid/mse", summary="min", step_metric="epoch")
-#     wandb.define_metric("valid/mre", summary="min", step_metric="epoch")
-#     wandb.define_metric("valid/dab", summary="min", step_metric="epoch")
-#     wandb.define_metric("valid/sum_mse_dab", summary="min", step_metric="epoch")
-#     wandb.define_metric("test/avg_bio", summary="max")
-
-
-# def evaluate(model: nn.Module, loader: DataLoader, return_raw: bool = False) -> float:
-#     """
-#     Evaluate the model on the evaluation data.
-#     """
-#     model.eval()
-#     total_loss = 0.0
-#     total_error = 0.0
-#     total_dab = 0.0
-#     total_num = 0
-#     predictions = []
-#     with torch.no_grad():
-#         for batch_data in loader:
-#             input_gene_ids = batch_data["gene_ids"].to(device)
-#             input_values = batch_data["values"].to(device)
-#             target_values = batch_data["target_values"].to(device)
-#             batch_labels = batch_data["batch_labels"].to(device)
-#             celltype_labels = batch_data["celltype_labels"].to(device)
-
-#             src_key_padding_mask = input_gene_ids.eq(vocab[pad_token])
-#             with torch.cuda.amp.autocast(enabled=config.amp):
-#                 output_dict = model(
-#                     input_gene_ids,
-#                     input_values,
-#                     src_key_padding_mask=src_key_padding_mask,
-#                     batch_labels=(
-#                         batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
-#                     ),
-#                     CLS=CLS,  # evaluation does not need CLS or CCE
-#                     CCE=False,
-#                     MVC=False,
-#                     ECS=False,
-#                     do_sample=do_sample_in_train,
-#                     # generative_training = False,
-#                 )
-#                 output_values = output_dict["cls_output"]
-#                 loss = criterion_cls(output_values, celltype_labels)
-
-#                 if DAB:
-#                     loss_dab = criterion_dab(output_dict["dab_output"], batch_labels)
-
-#             total_loss += loss.item() * len(input_gene_ids)
-#             accuracy = (output_values.argmax(1) == celltype_labels).sum().item()
-#             total_error += (1 - accuracy / len(input_gene_ids)) * len(input_gene_ids)
-#             total_dab += loss_dab.item() * len(input_gene_ids) if DAB else 0.0
-#             total_num += len(input_gene_ids)
-#             preds = output_values.argmax(1).cpu().numpy()
-#             predictions.append(preds)
-
-#     if return_raw:
-#         return np.concatenate(predictions, axis=0)
-
-#     return total_loss / total_num, total_error / total_num
-
-
-# best_val_loss = float("inf")
-# best_avg_bio = 0.0
-# best_model = None
-# # define_wandb_metrcis()
-
-# for epoch in range(1, epochs + 1):
-#     epoch_start_time = time.time()
-#     train_data_pt, valid_data_pt = prepare_data(sort_seq_batch=per_seq_batch_sample)
-#     train_loader = prepare_dataloader(
-#         train_data_pt,
-#         batch_size=batch_size,
-#         shuffle=False,
-#         intra_domain_shuffle=True,
-#         drop_last=False,
-#     )
-
-#     valid_loader = prepare_dataloader(
-#         valid_data_pt,
-#         batch_size=eval_batch_size,
-#         shuffle=False,
-#         intra_domain_shuffle=False,
-#         drop_last=False,
-#     )
-#     if config.do_train:
-#         train(
-#             model,
-#             loader=train_loader,
-#         )
-#     val_loss, val_err = evaluate(
-#         model,
-#         loader=valid_loader,
-#     )
-#     elapsed = time.time() - epoch_start_time
-#     logger.info("-" * 89)
-#     logger.info(
-#         f"| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | "
-#         f"valid loss/mse {val_loss:5.4f} | err {val_err:5.4f}"
-#     )
-#     logger.info("-" * 89)
-
-#     if val_loss < best_val_loss:
-#         best_val_loss = val_loss
-#         best_model = copy.deepcopy(model)
-#         # save the finetuned model
-#         model_save_path = "/home/chenshengquan/data/fengsicheng/scBackdoor/model/scGPT-finetuned/best_model.pt"
-#         torch.save(best_model.state_dict(), model_save_path)
-
-#         best_model_epoch = epoch
-#         logger.info(f"Best model with score {best_val_loss:5.4f}")
-
-#     scheduler.step()
-#     if DAB_separate_optim:
-#         scheduler_dab.step()
-#     if ADV:
-#         scheduler_D.step()
-#         scheduler_E.step()
-
-
-# # inference
-# def test(model: nn.Module, adata: DataLoader) -> float:
-#     all_counts = (
-#         adata.layers[input_layer_key].A
-#         if issparse(adata.layers[input_layer_key])
-#         else adata.layers[input_layer_key]
-#     )
-
-#     celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
-#     celltypes_labels = np.array(celltypes_labels)
-
-#     batch_ids = adata.obs["batch_id"].tolist()
-#     batch_ids = np.array(batch_ids)
-
-#     tokenized_test = tokenize_and_pad_batch(
-#         all_counts,
-#         gene_ids,
-#         max_len=max_seq_len,
-#         vocab=vocab,
-#         pad_token=pad_token,
-#         pad_value=pad_value,
-#         append_cls=True,  # append <cls> token at the beginning
-#         include_zero_gene=include_zero_gene,
-#     )
-
-#     input_values_test = random_mask_value(
-#         tokenized_test["values"],
-#         mask_ratio=mask_ratio,
-#         mask_value=mask_value,
-#         pad_value=pad_value,
-#     )
-
-#     test_data_pt = {
-#         "gene_ids": tokenized_test["genes"],
-#         "values": input_values_test,
-#         "target_values": tokenized_test["values"],
-#         "batch_labels": torch.from_numpy(batch_ids).long(),
-#         "celltype_labels": torch.from_numpy(celltypes_labels).long(),
-#     }
-
-#     test_loader = DataLoader(
-#         dataset=SeqDataset(test_data_pt),
-#         batch_size=eval_batch_size,
-#         shuffle=False,
-#         drop_last=False,
-#         num_workers=min(len(os.sched_getaffinity(0)), eval_batch_size // 2),
-#         pin_memory=True,
-#     )
-
-#     model.eval()
-#     predictions = evaluate(
-#         model,
-#         loader=test_loader,
-#         return_raw=True,
-#     )
-
-#     # compute accuracy, precision, recall, f1, kappa
-#     from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, cohen_kappa_score
-
-#     # 计算各项评估指标
-#     accuracy = accuracy_score(celltypes_labels, predictions)
-#     precision = precision_score(celltypes_labels, predictions, average="macro")
-#     recall = recall_score(celltypes_labels, predictions, average="macro")
-#     macro_f1 = f1_score(celltypes_labels, predictions, average="macro")
-#     kappa = cohen_kappa_score(celltypes_labels, predictions)
-
-#     # 将结果记录到日志
-#     logger.info(
-#         f"Accuracy: {accuracy:.3f}, Precision: {precision:.3f}, Recall: {recall:.3f}, "
-#         f"Macro F1: {macro_f1:.3f}, Kappa: {kappa:.3f}"
-#     )
-
-#     # 组织结果字典
-#     results = {
-#         "test/accuracy": accuracy,
-#         "test/precision": precision,
-#         "test/recall": recall,
-#         "test/macro_f1": macro_f1,
-#         "test/kappa": kappa,
-#     }
-
-#     return predictions, celltypes_labels, results
-
-
-# predictions, labels, results = test(best_model, adata_test)
-
-
-# def eval_posion(
-#     model: nn.Module, adata: DataLoader, target_label_id=target_label_index_global
-# ) -> float:
-#     all_counts = (
-#         adata.layers[input_layer_key].A
-#         if issparse(adata.layers[input_layer_key])
-#         else adata.layers[input_layer_key]
-#     )
-
-#     celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
-#     celltypes_labels = np.array(celltypes_labels)
-
-#     batch_ids = adata.obs["batch_id"].tolist()
-#     batch_ids = np.array(batch_ids)
-
-#     tokenized_test = tokenize_and_pad_batch(
-#         all_counts,
-#         gene_ids,
-#         max_len=max_seq_len,
-#         vocab=vocab,
-#         pad_token=pad_token,
-#         pad_value=pad_value,
-#         append_cls=True,  # append <cls> token at the beginning
-#         include_zero_gene=include_zero_gene,
-#     )
-
-#     input_values_test = random_mask_value(
-#         tokenized_test["values"],
-#         mask_ratio=mask_ratio,
-#         mask_value=mask_value,
-#         pad_value=pad_value,
-#     )
-
-#     test_data_pt = {
-#         "gene_ids": tokenized_test["genes"],
-#         "values": input_values_test,
-#         "target_values": tokenized_test["values"],
-#         "batch_labels": torch.from_numpy(batch_ids).long(),
-#         "celltype_labels": torch.from_numpy(celltypes_labels).long(),
-#     }
-
-#     test_loader = DataLoader(
-#         dataset=SeqDataset(test_data_pt),
-#         batch_size=eval_batch_size,
-#         shuffle=False,
-#         drop_last=False,
-#         num_workers=min(len(os.sched_getaffinity(0)), eval_batch_size // 2),
-#         pin_memory=True,
-#     )
-
-#     model.eval()
-#     predictions = evaluate(
-#         model,
-#         loader=test_loader,
-#         return_raw=True,
-#     )
-
-#     print(predictions)
-#     print(np.unique(np.array(predictions)))
-
-#     # ASR
-#     from sklearn.metrics import accuracy_score
-
-#     target_labels = np.full_like(predictions, fill_value=target_label_id)
-#     asr = accuracy_score(target_labels, predictions)
-#     logger.info(f"Poisoned Data - Attack Success Rate (ASR): {asr:.3f}")
-
-#     results = {
-#         "poisoned_data/asr": asr,
-#     }
-
-#     return predictions, celltypes_labels, results
-
-
-# predictions, labels, results = eval_posion(
-#     best_model, adata_test_posioned, target_label_id=target_label_index_global
-# )
+model.to(device)
+# wandb.watch(model)
+
+if ADV:
+    discriminator = AdversarialDiscriminator(
+        d_model=embsize,
+        n_cls=num_batch_types,
+    ).to(device)
+criterion = masked_mse_loss
+criterion_cls = nn.CrossEntropyLoss()
+criterion_dab = nn.CrossEntropyLoss()
+optimizer = torch.optim.Adam(
+    model.parameters(), lr=lr, eps=1e-4 if config.amp else 1e-8
+)
+scheduler = torch.optim.lr_scheduler.StepLR(
+    optimizer, schedule_interval, gamma=config.schedule_ratio
+)
+if DAB_separate_optim:
+    optimizer_dab = torch.optim.Adam(model.parameters(), lr=lr)
+    scheduler_dab = torch.optim.lr_scheduler.StepLR(
+        optimizer_dab, schedule_interval, gamma=config.schedule_ratio
+    )
+if ADV:
+    criterion_adv = nn.CrossEntropyLoss()  # consider using label smoothing
+    optimizer_E = torch.optim.Adam(model.parameters(), lr=lr_ADV)
+    scheduler_E = torch.optim.lr_scheduler.StepLR(
+        optimizer_E, schedule_interval, gamma=config.schedule_ratio
+    )
+    optimizer_D = torch.optim.Adam(discriminator.parameters(), lr=lr_ADV)
+    scheduler_D = torch.optim.lr_scheduler.StepLR(
+        optimizer_D, schedule_interval, gamma=config.schedule_ratio
+    )
+
+scaler = torch.cuda.amp.GradScaler(enabled=config.amp)
+
+
+def train(model: nn.Module, loader: DataLoader) -> None:
+    """
+    Train the model for one epoch.
+    """
+    model.train()
+    (
+        total_loss,
+        total_mse,
+        total_cls,
+        total_cce,
+        total_mvc,
+        total_ecs,
+        total_dab,
+        total_adv_E,
+        total_adv_D,
+        total_zero_log_prob,
+        total_mvc_zero_log_prob,
+    ) = (0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0, 0.0)
+    total_error = 0.0
+    start_time = time.time()
+
+    num_batches = len(loader)
+    for batch, batch_data in enumerate(loader):
+        input_gene_ids = batch_data["gene_ids"].to(device)
+        input_values = batch_data["values"].to(device)
+        target_values = batch_data["target_values"].to(device)
+        batch_labels = batch_data["batch_labels"].to(device)
+        celltype_labels = batch_data["celltype_labels"].to(device)
+
+        src_key_padding_mask = input_gene_ids.eq(vocab[pad_token])
+        with torch.cuda.amp.autocast(enabled=config.amp):
+            output_dict = model(
+                input_gene_ids,
+                input_values,
+                src_key_padding_mask=src_key_padding_mask,
+                batch_labels=(
+                    batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
+                ),
+                CLS=CLS,
+                CCE=CCE,
+                MVC=MVC,
+                ECS=ECS,
+                do_sample=do_sample_in_train,
+                # generative_training=False
+            )
+
+            masked_positions = input_values.eq(mask_value)  # the postions to predict
+            loss = 0.0
+            metrics_to_log = {}
+            if MLM:
+                loss_mse = criterion(
+                    output_dict["mlm_output"], target_values, masked_positions
+                )
+                loss = loss + loss_mse
+                metrics_to_log = {"train/mse": loss_mse.item()}
+            if explicit_zero_prob:
+                loss_zero_log_prob = criterion_neg_log_bernoulli(
+                    output_dict["mlm_zero_probs"], target_values, masked_positions
+                )
+                loss = loss + loss_zero_log_prob
+                metrics_to_log.update({"train/nzlp": loss_zero_log_prob.item()})
+            if CLS:
+                loss_cls = criterion_cls(output_dict["cls_output"], celltype_labels)
+                loss = loss + loss_cls
+                metrics_to_log.update({"train/cls": loss_cls.item()})
+
+                error_rate = 1 - (
+                    (output_dict["cls_output"].argmax(1) == celltype_labels)
+                    .sum()
+                    .item()
+                ) / celltype_labels.size(0)
+            if CCE:
+                loss_cce = 10 * output_dict["loss_cce"]
+                loss = loss + loss_cce
+                metrics_to_log.update({"train/cce": loss_cce.item()})
+            if MVC:
+                loss_mvc = criterion(
+                    output_dict["mvc_output"], target_values, masked_positions
+                )
+                loss = loss + loss_mvc
+                metrics_to_log.update({"train/mvc": loss_mvc.item()})
+            if MVC and explicit_zero_prob:
+                loss_mvc_zero_log_prob = criterion_neg_log_bernoulli(
+                    output_dict["mvc_zero_probs"], target_values, masked_positions
+                )
+                loss = loss + loss_mvc_zero_log_prob
+                metrics_to_log.update({"train/mvc_nzlp": loss_mvc_zero_log_prob.item()})
+            if ECS:
+                loss_ecs = 10 * output_dict["loss_ecs"]
+                loss = loss + loss_ecs
+                metrics_to_log.update({"train/ecs": loss_ecs.item()})
+            if DAB:
+                # try weighting and separate optimizer
+                loss_dab = criterion_dab(output_dict["dab_output"], batch_labels)
+                loss = loss + dab_weight * loss_dab
+                metrics_to_log.update({"train/dab": loss_dab.item()})
+        model.zero_grad()
+        scaler.scale(loss).backward()
+        scaler.unscale_(optimizer)
+        with warnings.catch_warnings(record=True) as w:
+            warnings.filterwarnings("always")
+            torch.nn.utils.clip_grad_norm_(
+                model.parameters(),
+                1.0,
+                error_if_nonfinite=False if scaler.is_enabled() else True,
+            )
+            if len(w) > 0:
+                logger.warning(
+                    f"Found infinite gradient. This may be caused by the gradient "
+                    f"scaler. The current scale is {scaler.get_scale()}. This warning "
+                    "can be ignored if no longer occurs after autoscaling of the scaler."
+                )
+        scaler.step(optimizer)
+        scaler.update()
+        if ADV:
+            # rerun the model for adversarial training
+            output_dict = model(
+                input_gene_ids,
+                input_values,
+                src_key_padding_mask=src_key_padding_mask,
+                batch_labels=(
+                    batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
+                ),
+                CLS=CLS,
+                CCE=CCE,
+                MVC=MVC,
+                ECS=ECS,
+                do_sample=do_sample_in_train,
+                # generative_training=False
+            )
+
+            # TRAINING DISCRIMINATOR
+            loss_adv_D = criterion_adv(
+                discriminator(output_dict["cell_emb"].detach()), batch_labels
+            )
+            if epoch > adv_D_delay_epochs:
+                discriminator.zero_grad()
+                loss_adv_D.backward()
+                optimizer_D.step()
+
+            # TRAINING ENCODER
+            loss_adv_E = -criterion_adv(
+                discriminator(output_dict["cell_emb"]), batch_labels
+            )
+            # NOTE: the loss is negative here because we want to maximize
+            # the cross_entropy_loss, in other words, disguise against the discriminator
+            if epoch > adv_E_delay_epochs:
+                model.zero_grad()
+                discriminator.zero_grad()
+                loss_adv_E.backward()
+                optimizer_E.step()
+
+        #         wandb.log(metrics_to_log)
+
+        total_loss += loss.item()
+        total_mse += loss_mse.item() if MLM else 0.0
+        total_cls += loss_cls.item() if CLS else 0.0
+        total_cce += loss_cce.item() if CCE else 0.0
+        total_mvc += loss_mvc.item() if MVC else 0.0
+        total_ecs += loss_ecs.item() if ECS else 0.0
+        total_dab += loss_dab.item() if DAB else 0.0
+        total_adv_E += loss_adv_E.item() if ADV else 0.0
+        total_adv_D += loss_adv_D.item() if ADV else 0.0
+        total_zero_log_prob += loss_zero_log_prob.item() if explicit_zero_prob else 0.0
+        total_mvc_zero_log_prob += (
+            loss_mvc_zero_log_prob.item() if MVC and explicit_zero_prob else 0.0
+        )
+        total_error += error_rate
+        if batch % log_interval == 0 and batch > 0:
+            lr = scheduler.get_last_lr()[0]
+            ms_per_batch = (time.time() - start_time) * 1000 / log_interval
+            cur_loss = total_loss / log_interval
+            cur_mse = total_mse / log_interval
+            cur_cls = total_cls / log_interval if CLS else 0.0
+            cur_cce = total_cce / log_interval if CCE else 0.0
+            cur_mvc = total_mvc / log_interval if MVC else 0.0
+            cur_ecs = total_ecs / log_interval if ECS else 0.0
+            cur_dab = total_dab / log_interval if DAB else 0.0
+            cur_adv_E = total_adv_E / log_interval if ADV else 0.0
+            cur_adv_D = total_adv_D / log_interval if ADV else 0.0
+            cur_zero_log_prob = (
+                total_zero_log_prob / log_interval if explicit_zero_prob else 0.0
+            )
+            cur_mvc_zero_log_prob = (
+                total_mvc_zero_log_prob / log_interval
+                if MVC and explicit_zero_prob
+                else 0.0
+            )
+            cur_error = total_error / log_interval
+            # ppl = math.exp(cur_loss)
+            logger.info(
+                f"| epoch {epoch:3d} | {batch:3d}/{num_batches:3d} batches | "
+                f"lr {lr:05.4f} | ms/batch {ms_per_batch:5.2f} | "
+                f"loss {cur_loss:5.2f} | "
+                + (f"mse {cur_mse:5.2f} | mre {cur_error:5.2f} |" if MLM else "")
+                + (f"cls {cur_cls:5.2f} | " if CLS else "")
+                + (f"err {cur_error:5.2f} | " if CLS else "")
+                + (f"cce {cur_cce:5.2f} |" if CCE else "")
+                + (f"mvc {cur_mvc:5.2f} |" if MVC else "")
+                + (f"ecs {cur_ecs:5.2f} |" if ECS else "")
+                + (f"dab {cur_dab:5.2f} |" if DAB else "")
+                + (f"adv_E {cur_adv_E:5.2f} |" if ADV else "")
+                + (f"adv_D {cur_adv_D:5.2f} |" if ADV else "")
+                + (f"nzlp {cur_zero_log_prob:5.2f} |" if explicit_zero_prob else "")
+                + (
+                    f"mvc_nzlp {cur_mvc_zero_log_prob:5.2f} |"
+                    if MVC and explicit_zero_prob
+                    else ""
+                )
+            )
+            total_loss = 0
+            total_mse = 0
+            total_cls = 0
+            total_cce = 0
+            total_mvc = 0
+            total_ecs = 0
+            total_dab = 0
+            total_adv_E = 0
+            total_adv_D = 0
+            total_zero_log_prob = 0
+            total_mvc_zero_log_prob = 0
+            total_error = 0
+            start_time = time.time()
+
+
+def define_wandb_metrcis():
+    wandb.define_metric("valid/mse", summary="min", step_metric="epoch")
+    wandb.define_metric("valid/mre", summary="min", step_metric="epoch")
+    wandb.define_metric("valid/dab", summary="min", step_metric="epoch")
+    wandb.define_metric("valid/sum_mse_dab", summary="min", step_metric="epoch")
+    wandb.define_metric("test/avg_bio", summary="max")
+
+
+def evaluate(model: nn.Module, loader: DataLoader, return_raw: bool = False) -> float:
+    """
+    Evaluate the model on the evaluation data.
+    """
+    model.eval()
+    total_loss = 0.0
+    total_error = 0.0
+    total_dab = 0.0
+    total_num = 0
+    predictions = []
+    with torch.no_grad():
+        for batch_data in loader:
+            input_gene_ids = batch_data["gene_ids"].to(device)
+            input_values = batch_data["values"].to(device)
+            target_values = batch_data["target_values"].to(device)
+            batch_labels = batch_data["batch_labels"].to(device)
+            celltype_labels = batch_data["celltype_labels"].to(device)
+
+            src_key_padding_mask = input_gene_ids.eq(vocab[pad_token])
+            with torch.cuda.amp.autocast(enabled=config.amp):
+                output_dict = model(
+                    input_gene_ids,
+                    input_values,
+                    src_key_padding_mask=src_key_padding_mask,
+                    batch_labels=(
+                        batch_labels if INPUT_BATCH_LABELS or config.DSBN else None
+                    ),
+                    CLS=CLS,  # evaluation does not need CLS or CCE
+                    CCE=False,
+                    MVC=False,
+                    ECS=False,
+                    do_sample=do_sample_in_train,
+                    # generative_training = False,
+                )
+                output_values = output_dict["cls_output"]
+                loss = criterion_cls(output_values, celltype_labels)
+
+                if DAB:
+                    loss_dab = criterion_dab(output_dict["dab_output"], batch_labels)
+
+            total_loss += loss.item() * len(input_gene_ids)
+            accuracy = (output_values.argmax(1) == celltype_labels).sum().item()
+            total_error += (1 - accuracy / len(input_gene_ids)) * len(input_gene_ids)
+            total_dab += loss_dab.item() * len(input_gene_ids) if DAB else 0.0
+            total_num += len(input_gene_ids)
+            preds = output_values.argmax(1).cpu().numpy()
+            predictions.append(preds)
+
+    if return_raw:
+        return np.concatenate(predictions, axis=0)
+
+    return total_loss / total_num, total_error / total_num
+
+
+best_val_loss = float("inf")
+best_avg_bio = 0.0
+best_model = None
+# define_wandb_metrcis()
+
+for epoch in range(1, epochs + 1):
+    epoch_start_time = time.time()
+    train_data_pt, valid_data_pt = prepare_data(sort_seq_batch=per_seq_batch_sample)
+    train_loader = prepare_dataloader(
+        train_data_pt,
+        batch_size=batch_size,
+        shuffle=False,
+        intra_domain_shuffle=True,
+        drop_last=False,
+    )
+
+    valid_loader = prepare_dataloader(
+        valid_data_pt,
+        batch_size=eval_batch_size,
+        shuffle=False,
+        intra_domain_shuffle=False,
+        drop_last=False,
+    )
+    if config.do_train:
+        train(
+            model,
+            loader=train_loader,
+        )
+    val_loss, val_err = evaluate(
+        model,
+        loader=valid_loader,
+    )
+    elapsed = time.time() - epoch_start_time
+    logger.info("-" * 89)
+    logger.info(
+        f"| end of epoch {epoch:3d} | time: {elapsed:5.2f}s | "
+        f"valid loss/mse {val_loss:5.4f} | err {val_err:5.4f}"
+    )
+    logger.info("-" * 89)
+
+    if val_loss < best_val_loss:
+        best_val_loss = val_loss
+        best_model = copy.deepcopy(model)
+        # save the finetuned model
+        model_save_path = "/home/chenshengquan/data/fengsicheng/scBackdoor/model/scGPT-finetuned/best_model.pt"
+        torch.save(best_model.state_dict(), model_save_path)
+
+        best_model_epoch = epoch
+        logger.info(f"Best model with score {best_val_loss:5.4f}")
+
+    scheduler.step()
+    if DAB_separate_optim:
+        scheduler_dab.step()
+    if ADV:
+        scheduler_D.step()
+        scheduler_E.step()
+
+
+# inference
+def test(model: nn.Module, adata: DataLoader) -> float:
+    all_counts = (
+        adata.layers[input_layer_key].A
+        if issparse(adata.layers[input_layer_key])
+        else adata.layers[input_layer_key]
+    )
+
+    celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
+    celltypes_labels = np.array(celltypes_labels)
+
+    batch_ids = adata.obs["batch_id"].tolist()
+    batch_ids = np.array(batch_ids)
+
+    tokenized_test = tokenize_and_pad_batch(
+        all_counts,
+        gene_ids,
+        max_len=max_seq_len,
+        vocab=vocab,
+        pad_token=pad_token,
+        pad_value=pad_value,
+        append_cls=True,  # append <cls> token at the beginning
+        include_zero_gene=include_zero_gene,
+    )
+
+    input_values_test = random_mask_value(
+        tokenized_test["values"],
+        mask_ratio=mask_ratio,
+        mask_value=mask_value,
+        pad_value=pad_value,
+    )
+
+    test_data_pt = {
+        "gene_ids": tokenized_test["genes"],
+        "values": input_values_test,
+        "target_values": tokenized_test["values"],
+        "batch_labels": torch.from_numpy(batch_ids).long(),
+        "celltype_labels": torch.from_numpy(celltypes_labels).long(),
+    }
+
+    test_loader = DataLoader(
+        dataset=SeqDataset(test_data_pt),
+        batch_size=eval_batch_size,
+        shuffle=False,
+        drop_last=False,
+        num_workers=min(len(os.sched_getaffinity(0)), eval_batch_size // 2),
+        pin_memory=True,
+    )
+
+    model.eval()
+    predictions = evaluate(
+        model,
+        loader=test_loader,
+        return_raw=True,
+    )
+
+    # compute accuracy, precision, recall, f1, kappa
+    from sklearn.metrics import accuracy_score, precision_score, recall_score, f1_score, cohen_kappa_score
+
+    # 计算各项评估指标
+    accuracy = accuracy_score(celltypes_labels, predictions)
+    precision = precision_score(celltypes_labels, predictions, average="macro")
+    recall = recall_score(celltypes_labels, predictions, average="macro")
+    macro_f1 = f1_score(celltypes_labels, predictions, average="macro")
+    kappa = cohen_kappa_score(celltypes_labels, predictions)
+
+    # 将结果记录到日志
+    logger.info(
+        f"Accuracy: {accuracy:.3f}, Precision: {precision:.3f}, Recall: {recall:.3f}, "
+        f"Macro F1: {macro_f1:.3f}, Kappa: {kappa:.3f}"
+    )
+
+    # 组织结果字典
+    results = {
+        "test/accuracy": accuracy,
+        "test/precision": precision,
+        "test/recall": recall,
+        "test/macro_f1": macro_f1,
+        "test/kappa": kappa,
+    }
+
+    return predictions, celltypes_labels, results
+
+
+predictions, labels, results = test(best_model, adata_test)
+
+# import utils.print_tools as prt
+
+# importlib.reload(prt)
+
+# prt.sankey_plot(predictions, labels, save_path="test.pdf")
+
+def eval_posion(
+    model: nn.Module, adata: DataLoader, target_label_id=target_label_index_global
+) -> float:
+    all_counts = (
+        adata.layers[input_layer_key].A
+        if issparse(adata.layers[input_layer_key])
+        else adata.layers[input_layer_key]
+    )
+
+    celltypes_labels = adata.obs["celltype_id"].tolist()  # make sure count from 0
+    celltypes_labels = np.array(celltypes_labels)
+
+    batch_ids = adata.obs["batch_id"].tolist()
+    batch_ids = np.array(batch_ids)
+
+    tokenized_test = tokenize_and_pad_batch(
+        all_counts,
+        gene_ids,
+        max_len=max_seq_len,
+        vocab=vocab,
+        pad_token=pad_token,
+        pad_value=pad_value,
+        append_cls=True,  # append <cls> token at the beginning
+        include_zero_gene=include_zero_gene,
+    )
+
+    input_values_test = random_mask_value(
+        tokenized_test["values"],
+        mask_ratio=mask_ratio,
+        mask_value=mask_value,
+        pad_value=pad_value,
+    )
+
+    test_data_pt = {
+        "gene_ids": tokenized_test["genes"],
+        "values": input_values_test,
+        "target_values": tokenized_test["values"],
+        "batch_labels": torch.from_numpy(batch_ids).long(),
+        "celltype_labels": torch.from_numpy(celltypes_labels).long(),
+    }
+
+    test_loader = DataLoader(
+        dataset=SeqDataset(test_data_pt),
+        batch_size=eval_batch_size,
+        shuffle=False,
+        drop_last=False,
+        num_workers=min(len(os.sched_getaffinity(0)), eval_batch_size // 2),
+        pin_memory=True,
+    )
+
+    model.eval()
+    predictions = evaluate(
+        model,
+        loader=test_loader,
+        return_raw=True,
+    )
+
+    print(predictions)
+    print(np.unique(np.array(predictions)))
+
+    # ASR
+    from sklearn.metrics import accuracy_score
+
+    target_labels = np.full_like(predictions, fill_value=target_label_id)
+    asr = accuracy_score(target_labels, predictions)
+    logger.info(f"Poisoned Data - Attack Success Rate (ASR): {asr:.3f}")
+
+    results = {
+        "poisoned_data/asr": asr,
+    }
+
+    return predictions, celltypes_labels, results
+
+
+predictions, labels, results = eval_posion(
+    best_model, adata_test_posioned, target_label_id=target_label_index_global
+)

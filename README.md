@@ -35,32 +35,24 @@ Sicheng Feng, Siyu Li, Luonan Chen, Shengquan Chen. Unveiling potential threats:
 </p>
 
 ## Requirements and Installation
-Use python 3.9 from Anaconda
-
-- torch==2.1.2
-- anndata==0.10.7
-- datasets==2.19.1
-- einops==0.8.0
-- matplotlib==3.9.0
-- numba==0.59.1                   
-- numpy==1.26.3                   
-- pandas==2.2.2                
-- scanpy==1.10.1             
-- scgpt==0.2.1                
-- scikit-learn==1.5.0
-- scipy==1.13.0 
-- torchtext==0.16.2
+We use python 3.9 from Anaconda. We provide two conda environments for the experiments: `base.yml` and `geneformer.yml`. The `base.yml` is for the scGPT and scBERT experiments, while the `geneformer.yml` is for the GeneFormer experiments.
 
 To install all dependencies:
 
 ```bash
-conda create -n scBackdoor python=3.9
-conda activate scBackdoor
-pip install -r requirements.txt
+conda env create -f base.yml
+
+# or
+conda env create -f geneformer.yml
 ```
 
 ## Datasets
-You can download the example datasets from [\[scGPT\]](https://github.com/bowang-lab/scGPT/blob/main/data/README.md) and [\[GeneFormer\]](https://huggingface.co/datasets/ctheodoris/Genecorpus-30M/tree/main/example_input_files/cell_classification/disease_classification/human_dcm_hcm_nf.dataset) , then place the downloaded contents under `Yourpath4Dataset` to reproduce the experiments.
+1. Example datasets from [\[scGPT\]](https://github.com/bowang-lab/scGPT/blob/main/data/README.md) 
+2. Example datasets from [\[GeneFormer\]](https://huggingface.co/datasets/ctheodoris/Genecorpus-30M/tree/main/example_input_files/cell_classification)
+3. Datasets from t[\[Tabula Sapiens Single-Cell Datase\]](https://figshare.com/articles/dataset/Tabula_Sapiens_release_1_0/14267219?file=34701976)
+
+
+Place the downloaded contents under `Yourpath4Dataset` to reproduce the experiments.
 
 ## Pretrained Models
 You can download the pretrained models from [\[scGPT\]](https://github.com/bowang-lab/scGPT/blob/main/README.md) (whole-human), [\[scBERT\]](https://github.com/TencentAILabHealthcare/scBERT) and [\[GeneFormer\]](https://huggingface.co/ctheodoris/Geneformer/tree/main), then place the downloaded contents under `Yourpath4PretrainedModels` to reproduce the experiments.
@@ -80,7 +72,13 @@ The commands to run the experiments are as follows:
 ```bash
 nohup ./run.sh & # for scGPT_Exp
 nohup ./run.sh & # for scBERT_Exp
-python geneformer_scBackdoor.py # for GeneFormer_Exp
+nohup ./run.sh & # for GeneFormer_Exp
+...
+
+# or you can run the experiments in tmux or screen
+./run_diff_batch.sh # for scGPT_Exp
+./run_diff_feature.sh # for scGPT_Exp
+...
 ```
 
 The poison-related code is in the `poison_utils.py` or `poison_trigger.py`. You can find them in each experiment's folder.
@@ -96,6 +94,9 @@ The folder tree is as follows:
 │── scGPT_Exp                             
 │   ├── test                              -- the attack pipeline
 │   │   ├── run.sh
+│   │   ├── run_diff_batch.sh             -- explore the impact of batch effects
+│   │   ├── run_diff_feature.sh           -- explore the impact of feature selection
+│   │   ├── run_3datasets.sh              
 │   │   └── scBackdoor.py
 │   └── utils                             -- the scGPT items
 │       ├── detect_tools.py
@@ -120,7 +121,8 @@ The folder tree is as follows:
 │   │   ├── pretrainer.py
 │   │   ├── token_dictionary.pkl
 │   │   └── tokenizer.py
-│   └── geneformer_scBackdoor.py          -- the attack pipeline
+│   ├── run.sh                            -- the attack pipeline
+│   └── geneformer_scBackdoor.py          
 └── scBERT_Exp
     ├── attn_sum_save.py
     ├── finetune.py
@@ -134,6 +136,7 @@ The folder tree is as follows:
     ├── preprocess.py
     ├── pretrain.py
     ├── run.sh                            -- the attack pipeline
+    ├── run_3datasets.sh
     └── utils.py
 ```
 

@@ -4,7 +4,7 @@
 OUTPUT_DIR="/home/chenshengquan/data/fengsicheng/scBackdoor/records2/Pancreas-scGPT/"
 mkdir -p "${OUTPUT_DIR}"
 
-export CUDA_VISIBLE_DEVICES="3"
+export CUDA_VISIBLE_DEVICES="0"
 
 echo "CUDA_VISIBLE_DEVICES set to: $CUDA_VISIBLE_DEVICES"
 
@@ -27,8 +27,8 @@ LABELS_AND_INDEXES["PP"]=1
 # LABELS_AND_INDEXES["schwann"]=12
 # LABELS_AND_INDEXES["t_cell"]=13
 
-
-TOPN_STOPS=("1.0")
+# use diff topn_stop
+TOPN_STOPS=("2.0" "4.0" "6.0" "8.0")
 
 # iterate over all combinations of parameters
 for POISON_RATE in "${POISON_RATES[@]}"; do
