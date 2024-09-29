@@ -49,7 +49,7 @@ conda env create -f geneformer.yml
 ## Datasets
 1. Example datasets from [\[scGPT\]](https://github.com/bowang-lab/scGPT/blob/main/data/README.md) 
 2. Example datasets from [\[GeneFormer\]](https://huggingface.co/datasets/ctheodoris/Genecorpus-30M/tree/main/example_input_files/cell_classification)
-3. Datasets from t[\[Tabula Sapiens Single-Cell Datase\]](https://figshare.com/articles/dataset/Tabula_Sapiens_release_1_0/14267219?file=34701976)
+3. Datasets from [\[Tabula Sapiens Single-Cell Datase\]](https://figshare.com/articles/dataset/Tabula_Sapiens_release_1_0/14267219?file=34701976)
 
 
 Place the downloaded contents under `Yourpath4Dataset` to reproduce the experiments.
