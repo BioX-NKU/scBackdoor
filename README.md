@@ -4,6 +4,8 @@
 
 <div align="center">
 
+![](https://img.shields.io/github/stars/fscdc/Oracle-Pruning-Sanity-Check?color=yellow)
+![](https://img.shields.io/github/forks/fscdc/Oracle-Pruning-Sanity-Check?color=lightblue)
 ![](https://img.shields.io/github/last-commit/BioX-NKU/scBackdoor?color=green)
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 
@@ -27,7 +29,7 @@
 > 🌟 If you find this resource helpful, please consider to star this repository and cite our research:
 
 ```bibtex
-Sicheng Feng, Siyu Li, Luonan Chen, Shengquan Chen. Unveiling potential threats: backdoor attacks in single-cell pretrained models. 2024.
+Feng, S., Li, S., Chen, L. et al. Unveiling potential threats: backdoor attacks in single-cell pre-trained models. Cell Discov 10, 122 (2024). https://doi.org/10.1038/s41421-024-00753-1
 ```
 
 <p align="center">
