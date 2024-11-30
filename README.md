@@ -4,8 +4,8 @@
 
 <div align="center">
 
-![](https://img.shields.io/github/stars/fscdc/Oracle-Pruning-Sanity-Check?color=yellow)
-![](https://img.shields.io/github/forks/fscdc/Oracle-Pruning-Sanity-Check?color=lightblue)
+![](https://img.shields.io/github/stars/BioX-NKU/scBackdoor?color=yellow)
+![](https://img.shields.io/github/forks/BioX-NKU/scBackdoor?color=lightblue)
 ![](https://img.shields.io/github/last-commit/BioX-NKU/scBackdoor?color=green)
 ![](https://img.shields.io/badge/PRs-Welcome-green)
 
