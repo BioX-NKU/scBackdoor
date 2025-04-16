@@ -13,7 +13,7 @@
 
 <div align="center">
 
-**[<a href="https://www.nature.com/articles/s41421-024-00753-1">Paper Page</a>]**
+**[<a href="https://www.nature.com/articles/s41421-024-00753-1">Cell Discovery</a>]**
 
 </div>
 
