@@ -13,7 +13,7 @@
 
 <div align="center">
 
-**[<a href="https://www.nature.com/articles/s41421-024-00753-1">Cell Discovery</a>]**
+**[<a href="https://www.nature.com/articles/s41421-024-00753-1">Cell Discovery</a>]** **[<a href="https://fscdc.github.io/scBackdoor/">Web</a>]** 
 
 </div>
 
@@ -25,9 +25,9 @@
 
 ---
 >
-> 🙋 Please let us know if you find out a mistake or have any suggestions!
+> 🙋 Please let us know if you find a mistake or have any suggestions!
 > 
-> 🌟 If you find this resource helpful, please consider to star this repository and cite our research:
+> 🌟 If you find this resource helpful, please consider starring this repository and citing our research:
 
 ```bibtex
 Feng, S., Li, S., Chen, L. et al. Unveiling potential threats: backdoor attacks in single-cell pre-trained models. Cell Discov 10, 122 (2024). https://doi.org/10.1038/s41421-024-00753-1
@@ -38,7 +38,7 @@ Feng, S., Li, S., Chen, L. et al. Unveiling potential threats: backdoor attacks 
 </p>
 
 ## Requirements and Installation
-We use python 3.9 from Anaconda. We provide two conda environments for the experiments: `base.yml` and `geneformer.yml`. The `base.yml` is for the scGPT and scBERT experiments, while the `geneformer.yml` is for the GeneFormer experiments.
+We use Python 3.9 from Anaconda. We provide two conda environments for the experiments: `base.yml` and `geneformer.yml`. The `base.yml` is for the scGPT and scBERT experiments, while the `geneformer.yml` is for the GeneFormer experiments.
 
 To install all dependencies:
 
